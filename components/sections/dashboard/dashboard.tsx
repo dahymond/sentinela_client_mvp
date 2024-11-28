@@ -9,664 +9,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Textarea } from "@/components/ui/textarea"
+import { AlertDetails } from './alertDashboard/alertDetails/alertDetails'
+import AlertQueueTab from './alertDashboard/alertTabs/alertQueueTab'
+import AlertAnalytics from './alertDashboard/alertTabs/alertAnalytics'
 
-interface AlertDetailsProps {
-  alert: AlertType;
-  onBack: () => void;
-  onUpdateDisposition: (disposition: string) => void;
-  setAlert: (updatedAlert: AlertType) => void;
-  allAlerts: AlertType[];
-}
 
-interface AlertType {
-  id: string;
-  name: string;
-  match: string;
-  disposition: string;
-  score: number;
-  alertDateTime: string;
-  details: {
-    customerDetails: {
-      address: string;
-      country: string;
-      dob: string;
-      idNumber: string;
-    };
-    entityEnrichment: {
-      email: string;
-      previousAddress: string;
-      employment: string;
-      socialMedia: string[];
-      education: string;
-    };
-    watchlistEntity: {
-      location: string;
-      reason: string;
-      source: string;
-      problematicTags: string[];
-    };
-    rawWatchlist: {
-      name: string;
-      dob: string;
-      nationality: string;
-      source: string;
-      reason: string;
-      nil: string;
-      emails: string[];
-      addresses: string[];
-      phones: string[];
-    };
-    dispositionOverview: string;
-    alertNarrative: string;
-    documentation: {
-      applicableRegulations: string;
-      referenceDocuments: string;
-      additionalNotes: string;
-    };
-    auditLog: Array<{
-      user: string;
-      timestamp: string;
-      action: string;
-      field?: string;
-      oldValue?: string;
-      newValue?: string;
-    }>;
-  };
-  additionalAlertsCount: number;
-}
-
-function AdditionalAlertsQueue({ alerts, onSelectAlert }: { alerts: AlertType[], onSelectAlert: (alert: AlertType) => void }) {
-  return (
-    <Card className="mt-6">
-      <CardHeader>
-        <CardTitle>Additional Alerts for This Customer</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[200px]">
-          {alerts.map((alert) => (
-            <div
-              key={alert.id}
-              className="flex justify-between items-center p-2 hover:bg-gray-100 cursor-pointer"
-              onClick={() => onSelectAlert({...alert, additionalAlertsCount: alerts.length - 1})}
-            >
-              <span>Alert ID: {alert.id}</span>
-              <span>Watchlist Match: {alert.match}</span>
-              <span>Risk Score: {alert.score}</span>
-              <span>Alert Date: {alert.alertDateTime}</span>
-            </div>
-          ))}
-        </ScrollArea>
-      </CardContent>
-    </Card>
-  );
-}
-
-function AlertDetails({ alert, onBack, onUpdateDisposition, setAlert, allAlerts }: AlertDetailsProps) {
-  const [isJsonExpanded, setIsJsonExpanded] = useState(false)
-  const [isEditingOverview, setIsEditingOverview] = useState(false)
-  const [isEditingNarrative, setIsEditingNarrative] = useState(false)
-  const [editedOverview, setEditedOverview] = useState(alert.details.dispositionOverview)
-  const [editedNarrative, setEditedNarrative] = useState(alert.details.alertNarrative)
-  const [isCustomerDetailsExpanded, setIsCustomerDetailsExpanded] = useState(true);
-  const [isWatchlistDetailsExpanded, setIsWatchlistDetailsExpanded] = useState(true);
-
-  const additionalAlerts = allAlerts.filter(a => 
-    a.id !== alert.id && 
-    (a.name === alert.name || a.details.customerDetails.idNumber === alert.details.customerDetails.idNumber)
-  ).concat([
-    {
-      ...alert,
-      id: '987654321',
-      match: 'EU Sanctions List',
-      disposition: 'Pending Review',
-      score: 65,
-      alertDateTime: '2023-06-01 10:30 AM',
-      additionalAlertsCount: 2,
-      details: {
-        ...alert.details,
-        watchlistEntity: {
-          location: 'Brussels, Belgium',
-          reason: 'Financial Sanctions',
-          source: 'EU Sanctions List',
-          problematicTags: ['Financial Crime', 'Money Laundering']
-        },
-        rawWatchlist: {
-          ...alert.details.rawWatchlist,
-          name: `${alert.name} (EU)`,
-          nationality: 'Belgian',
-          source: 'EU',
-          reason: 'Financial Sanctions'
-        },
-        dispositionOverview: `${alert.name} has been identified on the EU Sanctions List for potential involvement in financial crimes.`,
-        alertNarrative: `This alert was generated due to a match with the EU Sanctions List. The individual shares the same name and similar identifying information with a person sanctioned for financial crimes. Further investigation is required to confirm the match and determine appropriate action.`
-      }
-    },
-    {
-      ...alert,
-      id: '876543210',
-      match: 'Interpol Red Notice',
-      disposition: 'False Positive',
-      score: 40,
-      alertDateTime: '2023-05-28 02:15 PM',
-      additionalAlertsCount: 2,
-      details: {
-        ...alert.details,
-        watchlistEntity: {
-          location: 'Global',
-          reason: 'International Warrant',
-          source: 'Interpol Red Notice',
-          problematicTags: ['Fugitive', 'Fraud']
-        },
-        rawWatchlist: {
-          ...alert.details.rawWatchlist,
-          name: `${alert.name} (Interpol)`,
-          nationality: 'Unknown',
-          source: 'Interpol',
-          reason: 'International Warrant'
-        },
-        dispositionOverview: `${alert.name} was initially flagged due to a name match with an individual on Interpol's Red Notice list.`,
-        alertNarrative: `This alert was triggered by a name similarity with an individual on Interpol's Red Notice list. After thorough investigation, it was determined that this is a false positive. The date of birth, nationality, and other identifying information do not match the listed individual.`
-      }
-    }
-  ]);
-
-  const handleEditOverview = () => {
-    setIsEditingOverview(true)
-  }
-
-  const handleSaveOverview = () => {
-    const timestamp = new Date().toISOString();
-    const newAuditLogEntry = {
-      user: "Current User", // Replace with actual user name
-      timestamp: timestamp,
-      action: "Updated Alert Overview",
-      field: "dispositionOverview",
-      oldValue: alert.details.dispositionOverview,
-      newValue: editedOverview
-    };
-
-    setAlert({
-      ...alert,
-      details: {
-        ...alert.details,
-        dispositionOverview: editedOverview,
-        auditLog: [newAuditLogEntry, ...alert.details.auditLog]
-      }
-    });
-
-    setIsEditingOverview(false)
-    console.log('Saving updated overview:', editedOverview)
-  }
-
-  const handleCancelOverview = () => {
-    setEditedOverview(alert.details.dispositionOverview)
-    setIsEditingOverview(false)
-  }
-
-  const handleEditNarrative = () => {
-    setIsEditingNarrative(true)
-  }
-
-  const handleSaveNarrative = () => {
-    const timestamp = new Date().toISOString();
-    const newAuditLogEntry = {
-      user: "Current User", // Replace with actual user name
-      timestamp: timestamp,
-      action: "Updated Alert Narrative",
-      field: "alertNarrative",
-      oldValue: alert.details.alertNarrative,
-      newValue: editedNarrative
-    };
-
-    setAlert({
-      ...alert,
-      details: {
-        ...alert.details,
-        alertNarrative: editedNarrative,
-        auditLog: [newAuditLogEntry, ...alert.details.auditLog]
-      }
-    });
-
-    setIsEditingNarrative(false)
-    console.log('Saving updated narrative:', editedNarrative)
-  }
-
-  const handleCancelNarrative = () => {
-    setEditedNarrative(alert.details.alertNarrative)
-    setIsEditingNarrative(false)
-  }
-
-  const handleExportAlert = () => {
-    const selectedAreas = Array.from(document.querySelectorAll('select[multiple] option:checked')).map(option => option.value);
-    console.log(`Exporting alert areas: ${selectedAreas.join(', ')}`);
-  };
-
-  return (
-    <div className="bg-white shadow-lg rounded-lg p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" onClick={onBack}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Alerts
-          </Button>
-          <h2 className="text-2xl font-semibold text-gray-800">Alert Details</h2>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
-          </Button>
-          <div className="flex items-center space-x-2">
-            <Select multiple>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select areas to export" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="overview">Overview</SelectItem>
-                <SelectItem value="customerDetails">Customer Details</SelectItem>
-                <SelectItem value="watchlistMatch">Watchlist Match</SelectItem>
-                <SelectItem value="documentation">Documentation</SelectItem>
-                <SelectItem value="auditLog">Audit Log</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" onClick={handleExportAlert}>
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-6 mb-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Alert ID</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg font-semibold">{alert.id}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Customer Name</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg font-semibold">{alert.name}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Risk Score</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                <div
-                  className="bg-gradient-to-r from-green-400 to-red-500 h-full rounded-full"
-                  style={{ width: `${alert.score}%` }}
-                ></div>
-              </div>
-              <span className="text-lg font-semibold">{alert.score}</span>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Alert Date and Time</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg font-semibold">{alert.alertDateTime}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <AdditionalAlertsQueue alerts={additionalAlerts} onSelectAlert={(selectedAlert) => {
-        setAlert(selectedAlert);
-        setIsEditingOverview(false);
-        setIsEditingNarrative(false);
-        setEditedOverview(selectedAlert.details.dispositionOverview);
-        setEditedNarrative(selectedAlert.details.alertNarrative);
-      }} />
-
-      <div className="flex justify-end space-x-2 mb-4">
-        <Tabs defaultValue="overview" className="w-full">
-          <div className="flex justify-between items-center">
-            <TabsList className="mb-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="customerDetails">Customer Details</TabsTrigger>
-              <TabsTrigger value="watchlistMatch">Watchlist Match</TabsTrigger>
-              <TabsTrigger value="documentation">Documentation</TabsTrigger>
-              <TabsTrigger value="auditLog">Audit Log</TabsTrigger>
-            </TabsList>
-            <div className="flex space-x-2">
-              <Button variant="outline" className="bg-black text-white hover:bg-gray-800" onClick={() => onUpdateDisposition('True Positive')}>True Positive</Button>
-              <Button variant="outline" className="bg-black text-white hover:bg-gray-800" onClick={() => onUpdateDisposition('False Positive')}>False Positive</Button>
-              <Button variant="outline" className="bg-black text-white hover:bg-gray-800" onClick={() => onUpdateDisposition('Escalated')}>Escalate</Button>
-              <Button variant="outline" className="bg-black text-white hover:bg-gray-800" onClick={() => onUpdateDisposition('Pending Review')}>Pending</Button>
-            </div>
-          </div>
-          <TabsContent value="overview">
-            <Card>
-              <CardContent className="p-6">
-                <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="text-lg font-semibold">Alert Overview</h3>
-                        {isEditingOverview ? (
-                          <div>
-                            <Button variant="ghost" size="sm" onClick={handleSaveOverview}>
-                              <Save className="w-4 h-4 mr-2" />
-                              Save
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={handleCancelOverview}>
-                              <X className="w-4 h-4 mr-2" />
-                              Cancel
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button variant="ghost" size="sm" onClick={handleEditOverview}>
-                            <Edit2 className="w-4 h-4 mr-2" />
-                            Edit
-                          </Button>
-                        )}
-                      </div>
-                      {isEditingOverview ? (
-                        <Textarea
-                          value={editedOverview}
-                          onChange={(e) => setEditedOverview(e.target.value)}
-                          className="w-full h-32"
-                        />
-                      ) : (
-                        <p className="text-gray-600 mb-4">{editedOverview}</p>
-                      )}
-                      <h4 className="text-md font-semibold mb-2">Watchlist Match</h4>
-                      <p className="text-gray-600 mb-2"><span className="font-medium">Source:</span> {alert.match}</p>
-                      <p className="text-gray-600 mb-2"><span className="font-medium">Reason:</span> {alert.details.watchlistEntity.reason}</p>
-                      <h4 className="text-md font-semibold mt-4 mb-2">Problematic Tags</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {alert.details.watchlistEntity.problematicTags.map((tag, index) => (
-                          <span key={index} className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold  mb-2">Disposition</h3>
-                      <p className="text-gray-600 mb-4">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            alert.disposition === 'Pending Review'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : alert.disposition === 'False Positive'
-                              ? 'bg-green-100 text-green-800'
-                              : alert.disposition ===   'Escalated'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-blue-100 text-blue-800'
-                          }`}
-                        >
-                          {alert.disposition}
-                        </span>
-                      </p>
-                      <div className="flex justify-between items-center mb-2">
-                        <h4 className="text-md font-semibold">Alert Narrative</h4>
-                        {isEditingNarrative ? (
-                          <div>
-                            <Button variant="ghost" size="sm" onClick={handleSaveNarrative}>
-                              <Save className="w-4 h-4 mr-2" />
-                              Save
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={handleCancelNarrative}>
-                              <X className="w-4 h-4 mr-2" />
-                              Cancel
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button variant="ghost" size="sm" onClick={handleEditNarrative}>
-                            <Edit2 className="w-4 h-4 mr-2" />
-                            Edit
-                          </Button>
-                        )}
-                      </div>
-                      {isEditingNarrative ? (
-                        <Textarea
-                          value={editedNarrative}
-                          onChange={(e) => setEditedNarrative(e.target.value)}
-                          className="w-full h-32"
-                        />
-                      ) : (
-                        <p className="text-gray-600">{editedNarrative}</p>
-                      )}
-                    </div>
-                  </div>
-                  <Card className="mt-6">
-                    <CardContent className="p-6">
-                      <div className="grid grid-cols-2 gap-6">
-                        <Collapsible
-                          open={isCustomerDetailsExpanded}
-                          onOpenChange={setIsCustomerDetailsExpanded}
-                        >
-                          <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-lg font-semibold">Customer Details</h3>
-                            <CollapsibleTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                {isCustomerDetailsExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                              </Button>
-                            </CollapsibleTrigger>
-                          </div>
-                          <CollapsibleContent>
-                            <p className="text-gray-600 mb-2"><span className="font-medium">Name:</span> {alert.name}</p>
-                            <p className="text-gray-600 mb-2"><span className="font-medium">Address:</span> {alert.details.customerDetails.address}</p>
-                            <p className="text-gray-600 mb-2"><span className="font-medium">Country:</span> {alert.details.customerDetails.country}</p>
-                            <p className="text-gray-600 mb-2"><span className="font-medium">Date of Birth:</span> {alert.details.customerDetails.dob}</p>
-                            <p className="text-gray-600 mb-2"><span className="font-medium">ID Number:</span> {alert.details.customerDetails.idNumber}</p>
-                          </CollapsibleContent>
-                        </Collapsible>
-                        <Collapsible
-                          open={isWatchlistDetailsExpanded}
-                          onOpenChange={setIsWatchlistDetailsExpanded}
-                        >
-                          <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-lg font-semibold">Watchlist Details</h3>
-                            <CollapsibleTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                {isWatchlistDetailsExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                              </Button>
-                            </CollapsibleTrigger>
-                          </div>
-                          <CollapsibleContent>
-                            <p className="text-gray-600 mb-2"><span className="font-medium">Name:</span> {alert.details.rawWatchlist.name}</p>
-                            <p className="text-gray-600 mb-2"><span className="font-medium">Date of Birth:</span> {alert.details.rawWatchlist.dob}</p>
-                            <p className="text-gray-600 mb-2"><span className="font-medium">Nationality:</span> {alert.details.rawWatchlist.nationality}</p>
-                            <p className="text-gray-600 mb-2"><span className="font-medium">Source:</span> {alert.details.rawWatchlist.source}</p>
-                            <p className="text-gray-600 mb-2"><span className="font-medium">Reason:</span> {alert.details.rawWatchlist.reason}</p>
-                          </CollapsibleContent>
-                        </Collapsible>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="customerDetails">
-            <Card>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Customer Information</h3>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Name:</span> {alert.name}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Address:</span> {alert.details.customerDetails.address}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Country:</span> {alert.details.customerDetails.country}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Date of Birth:</span> {alert.details.customerDetails.dob}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">ID Number:</span> {alert.details.customerDetails.idNumber}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Entity Enrichment</h3>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Email:</span> {alert.details.entityEnrichment.email}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Previous Address:</span> {alert.details.entityEnrichment.previousAddress}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Employment:</span> {alert.details.entityEnrichment.employment}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Education:</span> {alert.details.entityEnrichment.education}</p>
-                    <h4 className="text-md font-semibold mt-4 mb-2">Social Media</h4>
-                    <ul className="list-disc pl-5">
-                      {alert.details.entityEnrichment.socialMedia.map((link, index) => (
-                        <li key={index} className="text-gray-600">{link}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="watchlistMatch">
-            <Card>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Watchlist Entity</h3>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Name:</span> {alert.details.rawWatchlist.name}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Date of Birth:</span> {alert.details.rawWatchlist.dob}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Nationality:</span> {alert.details.rawWatchlist.nationality}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Source:</span> {alert.details.rawWatchlist.source}</p>
-                    <p className="text-gray-600 mb-2"><span className="font-medium">Reason:</span> {alert.details.rawWatchlist.reason}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-4">Additional Information</h3>
-                    <h4 className="text-md font-semibold mb-2">Emails</h4>
-                    <ul className="list-disc pl-5 mb-4">
-                      {alert.details.rawWatchlist.emails.map((email, index) => (
-                        <li key={index} className="text-gray-600">{email || 'N/A'}</li>
-                      ))}
-                    </ul>
-                    <h4 className="text-md font-semibold mb-2">Addresses</h4>
-                    <ul className="list-disc pl-5 mb-4">
-                      {alert.details.rawWatchlist.addresses.map((address, index) => (
-                        <li key={index} className="text-gray-600">{address}</li>
-                      ))}
-                    </ul>
-                    <h4 className="text-md font-semibold mb-2">Phone Numbers</h4>
-                    <ul className="list-disc pl-5">
-                      {alert.details.rawWatchlist.phones.map((phone, index) => (
-                        <li key={index} className="text-gray-600">{phone || 'N/A'}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <Collapsible
-                    open={isJsonExpanded}
-                    onOpenChange={setIsJsonExpanded}
-                    className="w-full"
-                  >
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-md font-semibold mb-2">Watchlist JSON</h4>
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" size="sm" className="w-9 p-0">
-                          {isJsonExpanded ? (
-                            <ChevronUp className="h-4 w-4" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4" />
-                          )}
-                          <span className="sr-only">Toggle Watchlist JSON</span>
-                        </Button>
-                      </CollapsibleTrigger>
-                    </div>
-                    <CollapsibleContent className="mt-2">
-                      <ScrollArea className="h-[200px] w-full rounded-md border">
-                        <pre className="p-4 text-sm">
-                          {JSON.stringify(alert.details.rawWatchlist, null, 2)}
-                        </pre>
-                      </ScrollArea>
-                    </CollapsibleContent>
-                  </Collapsible>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="documentation">
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Documentation</h3>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-md font-semibold mb-2">Applicable Regulations</h4>
-                    <p className="text-gray-600">{alert.details.documentation.applicableRegulations}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-md font-semibold mb-2">Reference Documents</h4>
-                    <ul className="list-disc pl-5">
-                      {alert.details.documentation.referenceDocuments.split(', ').map((doc, index) => (
-                        <li key={index} className="text-blue-600 hover:underline">
-                          <a href="#">{doc}</a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="text-md font-semibold mb-2">Evidence Links</h4>
-                    <ul className="list-disc pl-5">
-                      <li className="text-blue-600 hover:underline">
-                        <a href="#">Transaction History</a>
-                      </li>
-                      <li className="text-blue-600 hover:underline">
-                        <a href="#">Customer Profile</a>
-                      </li>
-                      <li className="text-blue-600 hover:underline">
-                        <a href="#">Watchlist Match Details</a>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="text-md font-semibold mb-2">Additional Notes</h4>
-                    <p className="text-gray-600">{alert.details.documentation.additionalNotes}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="auditLog">
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Audit Log</h3>
-                <ScrollArea className="h-[400px] w-full rounded-md border p-4">
-                  {alert.details.auditLog.map((entry, index) => (
-                    <div key={index} className="mb-4 last:mb-0">
-                      <p className="text-sm text-gray-500">{entry.timestamp}</p>
-                      <p className="font-medium">{entry.user}</p>
-                      <p className="text-gray-600">{entry.action}</p>
-                      {entry.field && (
-                        <p className="text-sm text-gray-600">
-                          Field: {entry.field}
-                          {entry.oldValue && entry.newValue && (
-                            <span> - Changed from "{entry.oldValue}" to "{entry.newValue}"</span>
-                          )}
-                        </p>
-                      )}
-                      {index < alert.details.auditLog.length - 1 && <Separator className="my-2" />}
-                    </div>
-                  ))}
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
-  )
-}
 
 export function DashboardComponent() {
-  const TOTAL_ALLOWED_SCREENINGS = 1000; // Hypothetical total number of screenings allowed
+ 
   const initialQueueData = [
     {
       id: '123456789',
@@ -777,7 +127,7 @@ export function DashboardComponent() {
         auditLog: [
           { user: "Mike Johnson", timestamp: "2023-05-10 2:15 PM", action: "Marked as False Positive", field: "disposition", oldValue: "Pending Review", newValue: "False Positive" },
           { user: "Emily Brown", timestamp: "2023-05-09 11:20 AM", action: "Additional Verification Completed" },
-          { user: "David Wilson", timestamp: "2023-05-08 9:45 AM", action: "Initial Review Started"           },
+          { user: "David Wilson", timestamp: "2023-05-08 9:45 AM", action: "Initial Review Started" },
           { user: "System", timestamp: "2023-05-08 9:00 AM", action: "Alert Created" }
         ]
       }
@@ -928,7 +278,7 @@ export function DashboardComponent() {
           problematicTags: ['Terrorism', 'Proliferation Financing']
         },
         rawWatchlist: {
-          name:  "David A. Wilson",
+          name: "David A. Wilson",
           dob: "1976-07-04",
           nationality: "United States",
           source: "OFAC",
@@ -946,7 +296,7 @@ export function DashboardComponent() {
           additionalNotes: "Immediate account freeze and reporting to relevant authorities is required. All past transactions should be reviewed for potential sanctions violations."
         },
         auditLog: [
-          {  user: "Monica Geller", timestamp: "2023-05-16 5:00 PM", action: "Confirmed True Positive Match", field: "disposition", oldValue: "Escalated", newValue: "True Positive" },
+          { user: "Monica Geller", timestamp: "2023-05-16 5:00 PM", action: "Confirmed True Positive Match", field: "disposition", oldValue: "Escalated", newValue: "True Positive" },
           { user: "Phoebe Buffay", timestamp: "2023-05-16 2:30 PM", action: "Completed In-Depth Investigation" },
           { user: "Joey Tribbiani", timestamp: "2023-05-15 10:45 AM", action: "Escalated for Urgent Review", field: "disposition", oldValue: "Pending Review", newValue: "Escalated" },
           { user: "System", timestamp: "2023-05-15 9:00 AM", action: "Alert Created" }
@@ -1415,7 +765,7 @@ export function DashboardComponent() {
           employment: 'Unknown',
           socialMedia: [],
           education: 'Unknown'
-                                },
+        },
         watchlistEntity: {
           location: 'St. Petersburg, Russia',
           reason: 'Cyber-related Sanctions',
@@ -1446,15 +796,13 @@ export function DashboardComponent() {
   ]
 
   const [activeTab, setActiveTab] = useState('alerts')
-  const [selectedAlert, setSelectedAlert] = useState(null)
+  const [selectedAlert, setSelectedAlert] = useState<any>(null)
   const [isMenuExpanded, setIsMenuExpanded] = useState(true)
   const [fuzzyScore, setFuzzyScore] = useState(50)
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterDisposition, setFilterDisposition] = useState('all')
-  const [sortBy, setSortBy] = useState('id')
-  const [sortOrder, setSortOrder] = useState('asc')
+
   const [queueData, setQueueData] = useState(initialQueueData)
-  const [escalatedAlerts, setEscalatedAlerts] = useState([])
+  const [escalatedAlerts, setEscalatedAlerts] = useState<any>([])
   const [columnOrder, setColumnOrder] = useState(['id', 'name', 'match', 'disposition', 'score', 'additionalAlertsCount']);
 
   const menuItems = [
@@ -1463,51 +811,8 @@ export function DashboardComponent() {
     { icon: <Settings className="w-5 h-5" />, label: 'Screening Setup', value: 'setup' },
   ]
 
-  const filteredAndSortedQueueData = queueData
-    .filter(alert => 
-      (searchQuery === '' || 
-              alert.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       alert.id.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (filterDisposition === 'all' || alert.disposition === filterDisposition)
-    )
-    .sort((a, b) => {
-      if (sortBy === 'id') {
-        return sortOrder === 'asc' ? a.id.localeCompare(b.id) : b.id.localeCompare(a.id)
-      } else if (sortBy === 'name') {
-        return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
-      } else if (sortBy === 'score') {
-        return sortOrder === 'asc' ? a.score - b.score : b.score - a.score
-      } else if (sortBy === 'alertDateTime') {
-        return sortOrder === 'asc' ? new Date(a.alertDateTime).getTime() - new Date(b.alertDateTime).getTime() : new Date(b.alertDateTime).getTime() - new Date(a.alertDateTime).getTime();
-      }
-      return 0
-    })
 
-  const dispositionData = [
-    { name: 'True Positive', value: queueData.filter(alert => alert.disposition === 'True Positive').length + escalatedAlerts.filter(alert => alert.disposition === 'True Positive').length },
-    { name: 'False Positive', value: queueData.filter(alert => alert.disposition === 'False Positive').length + escalatedAlerts.filter(alert => alert.disposition === 'False Positive').length },
-    { name: 'Escalated', value: queueData.filter(alert => alert.disposition === 'Escalated').length + escalatedAlerts.filter(alert => alert.disposition === 'Escalated').length },
-    { name: 'Pending Review', value: queueData.filter(alert => alert.disposition === 'Pending Review').length + escalatedAlerts.filter(alert => alert.disposition === 'Pending Review').length },
-  ];
-
-  const watchlistData = [
-    { name: 'OFAC SDN List', value: queueData.filter(alert => alert.match === 'OFAC SDN List').length + escalatedAlerts.filter(alert => alert.match === 'OFAC SDN List').length },
-    { name: 'UN Consolidated List', value: queueData.filter(alert => alert.match === 'UN Consolidated List').length + escalatedAlerts.filter(alert => alert.match === 'UN Consolidated List').length },
-    { name: 'EU Sanctions List', value: queueData.filter(alert => alert.match === 'EU Sanctions List').length + escalatedAlerts.filter(alert => alert.match === 'EU Sanctions List').length },
-  ];
-
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
-
-  const monthlyData = [
-    { month: 'Jan', alerts: 45, falsePositives: 30 },
-    { month: 'Feb', alerts: 52, falsePositives: 35 },
-    { month: 'Mar', alerts: 48, falsePositives: 28 },
-    { month: 'Apr', alerts: 70, falsePositives: 45 },
-    { month: 'May', alerts: 61, falsePositives: 39 },
-    { month: 'Jun', alerts: 65, falsePositives: 42 },
-  ]
-
-  const renderAlertTable = (data) => (
+  const renderAlertTable = (data: any) => (
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
@@ -1517,11 +822,11 @@ export function DashboardComponent() {
                 <div className="flex items-center">
                   <span className="mr-2">
                     {column === 'id' ? 'Alert ID' :
-                     column === 'name' ? 'Customer Name' :
-                     column === 'match' ? 'Watchlist Match' :
-                     column === 'disposition' ? 'Disposition' :
-                     column === 'score' ? 'Risk Score' :
-                     column === 'additionalAlertsCount' ? 'Additional Alerts' : column}
+                      column === 'name' ? 'Customer Name' :
+                        column === 'match' ? 'Watchlist Match' :
+                          column === 'disposition' ? 'Disposition' :
+                            column === 'score' ? 'Risk Score' :
+                              column === 'additionalAlertsCount' ? 'Additional Alerts' : column}
                   </span>
                   <div className="flex flex-col">
                     <Button
@@ -1547,9 +852,9 @@ export function DashboardComponent() {
           </tr>
         </thead>
         <tbody>
-          {data.map((row) => (
-            <tr 
-              key={row.id} 
+          {data.map((row: any) => (
+            <tr
+              key={row.id}
               className="border-b last:border-b-0 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
               onClick={() => setSelectedAlert(row)}
             >
@@ -1557,15 +862,14 @@ export function DashboardComponent() {
                 <td key={column} className="py-4">
                   {column === 'disposition' ? (
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        row.disposition === 'Pending Review'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : row.disposition === 'False Positive'
+                      className={`px-2 py-1 rounded-full text-xs ${row.disposition === 'Pending Review'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : row.disposition === 'False Positive'
                           ? 'bg-green-100 text-green-800'
                           : row.disposition === 'Escalated'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-blue-100 text-blue-800'
+                        }`}
                     >
                       {row.disposition}
                     </span>
@@ -1600,7 +904,7 @@ export function DashboardComponent() {
       timestamp: timestamp,
       action: `Updated disposition to ${newDisposition}`,
       field: "disposition",
-      oldValue: selectedAlert.disposition,
+      oldValue: selectedAlert ? selectedAlert.disposition : {},
       newValue: newDisposition
     };
 
@@ -1616,8 +920,8 @@ export function DashboardComponent() {
     // If escalated, add to escalatedAlerts
     if (newDisposition === 'Escalated') {
       setEscalatedAlerts([...escalatedAlerts, updatedAlert]);
-    } else if (newDisposition !== 'Escalated' && escalatedAlerts.find(alert => alert.id === updatedAlert.id)) {
-      const updatedEscalatedAlerts = escalatedAlerts.filter(alert => alert.id !== updatedAlert.id);
+    } else if (newDisposition !== 'Escalated' && escalatedAlerts.find((alert: any) => alert.id === updatedAlert.id)) {
+      const updatedEscalatedAlerts = escalatedAlerts.filter((alert: any) => alert.id !== updatedAlert.id);
       setEscalatedAlerts(updatedEscalatedAlerts);
     }
 
@@ -1674,179 +978,18 @@ export function DashboardComponent() {
                     <TabsTrigger value="queue">Alerts Queue</TabsTrigger>
                     <TabsTrigger value="analytics">Alerts Analytics</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="queue">
-                    <div className="mb-4 flex justify-between items-center">
-                      <div className="flex items-center space-x-2">
-                        <Select value={filterDisposition} onValueChange={setFilterDisposition}>
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Filter by disposition" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Dispositions</SelectItem>
-                            <SelectItem value="True Positive">True Positive</SelectItem>
-                            <SelectItem value="False Positive">False Positive</SelectItem>
-                            <SelectItem value="Escalated">Escalated</SelectItem>
-                            <SelectItem value="Pending Review">Pending Review</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Select value={sortBy} onValueChange={setSortBy}>
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Sort by" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="id">Alert ID</SelectItem>
-                            <SelectItem value="name">Customer Name</SelectItem>
-                            <SelectItem value="score">Risk Score</SelectItem>
-                            <SelectItem value="alertDateTime">Alert Date and Time</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Button variant="outline" onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
-                          <ArrowUpDown className="w-4 h-4 mr-2" />
-                          {sortOrder === 'asc' ? 'Ascending' : 'Descending'}
-                        </Button>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Button variant="outline" onClick={() => setFilterDisposition('all')}>Clear Filters</Button>
-                      </div>
-                    </div>
-                    <div className="mb-4">
-                      <h3 className="text-lg font-semibold mb-2">Column Order</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {columnOrder.map((column, index) => (
-                          <div key={column} className="flex items-center">
-                            <span className="mr-2">{column}</span>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleColumnOrderChange(column, -1)}
-                              disabled={index === 0}
-                            >
-                              ↑
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleColumnOrderChange(column, 1)}
-                              disabled={index === columnOrder.length - 1}
-                            >
-                              ↓
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    {renderAlertTable(filteredAndSortedQueueData)}
-                  </TabsContent>
-                  <TabsContent value="analytics">
-                    <div className="grid grid-cols-2 gap-6">
-                      <Card className="bg-white shadow">
-                        <CardContent>
-                          <h3 className="text-lg font-semibold mb-4 text-gray-800">Disposition Distribution</h3>
-                          <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                              <Pie
-                                data={dispositionData}
-                                cx="50%"
-                                cy="50%"
-                                labelLine={false}
-                                outerRadius={80}
-                                fill="#8884d8"
-                                dataKey="value"
-                                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                              >
-                                {dispositionData.map((entry, index) => (
-                                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                              </Pie>
-                              <Tooltip />
-                              <Legend />
-                            </PieChart>
-                          </ResponsiveContainer>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-white shadow">
-                        <CardContent>
-                          <h3 className="text-lg font-semibold mb-4 text-gray-800">Watchlist Distribution</h3>
-                          <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                              <Pie
-                                data={watchlistData}
-                                cx="50%"
-                                cy="50%"
-                                labelLine={false}
-                                outerRadius={80}
-                                fill="#8884d8"
-                                dataKey="value"
-                                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                              >
-                                {watchlistData.map((entry, index) => (
-                                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                              </Pie>
-                              <Tooltip />
-                              <Legend />
-                            </PieChart>
-                          </ResponsiveContainer>
-                        </CardContent>
-                      </Card>
-                    </div>
-                    <Card className="bg-white shadow mt-6">
-                      <CardContent>
-                        <h3 className="text-lg font-semibold mb-4 text-gray-800">Alert Summary</h3>
-                        <table className="w-full text-gray-800">
-                          <thead>
-                            <tr className="text-left border-b border-gray-200">
-                              <th className="pb-2">Metric</th>
-                              <th className="pb-2">Value</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td className="py-2">Total Alerts</td>
-                              <td className="py-2">{queueData.length + escalatedAlerts.length}</td>
-                            </tr>
-                            <tr>
-                              <td className="py-2">Average Risk Score</td>
-                              <td className="py-2">
-                                {((queueData.reduce((sum, alert) => sum + alert.score, 0) + 
-                                   escalatedAlerts.reduce((sum, alert) => sum + alert.score, 0)) / 
-                                  (queueData.length + escalatedAlerts.length)).toFixed(2)}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="py-2">Alerts Requiring Action</td>
-                              <td className="py-2">
-                                {queueData.filter(alert => ['True Positive', 'Escalated', 'Pending Review'].includes(alert.disposition)).length +
-                                 escalatedAlerts.filter(alert => ['True Positive', 'Escalated', 'Pending Review'].includes(alert.disposition)).length}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="py-2">Screenings Left</td>
-                              <td className="py-2">
-                                {Math.max(0, TOTAL_ALLOWED_SCREENINGS - (queueData.length + escalatedAlerts.length))}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </CardContent>
-                    </Card>
-                    <Card className="bg-white shadow mt-6">
-                      <CardContent>
-                        <h3 className="text-lg font-semibold mb-4 text-gray-800">Monthly Alert Trends</h3>
-                        <ResponsiveContainer width="100%" height={300}>
-                          <LineChart data={monthlyData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="month" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Line type="monotone" dataKey="alerts" stroke="#8884d8" activeDot={{ r: 8 }} />
-                            <Line type="monotone" dataKey="falsePositives" stroke="#82ca9d" />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
+
+                  {/* ALERTS QUEUE */}
+                  <AlertQueueTab
+                    queueData={queueData}
+                    searchQuery={searchQuery}
+                    columnOrder={columnOrder}
+                    handleColumnOrderChange={handleColumnOrderChange}
+                    renderAlertTable={renderAlertTable}
+                  />
+
+                  {/* Alerts Analytics */}
+                  <AlertAnalytics queueData = {queueData} escalatedAlerts={escalatedAlerts}/>
                 </Tabs>
               </>
             )}
@@ -1954,9 +1097,8 @@ export function DashboardComponent() {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <nav
-        className={`fixed left-0 top-0 h-full bg-white shadow-lg p-4 transition-all duration-300 ease-in-out ${
-          isMenuExpanded ? 'w-64' : 'w-20'
-        }`}
+        className={`fixed left-0 top-0 h-full bg-white shadow-lg p-4 transition-all duration-300 ease-in-out ${isMenuExpanded ? 'w-64' : 'w-20'
+          }`}
       >
         <Button
           variant="ghost"
@@ -1971,11 +1113,10 @@ export function DashboardComponent() {
             <li key={item.value}>
               <button
                 onClick={() => setActiveTab(item.value)}
-                className={`w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 transition-all ${
-                  activeTab === item.value
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 transition-all ${activeTab === item.value
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+                  }`}
               >
                 {item.icon}
                 {isMenuExpanded && <span>{item.label}</span>}
