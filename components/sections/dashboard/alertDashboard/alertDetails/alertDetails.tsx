@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertType } from "../../../../interfaces/interfaces";
+// import { AlertType } from "../../../../interfaces/interfaces";
 import { AlertDetailsProps } from '../../../../interfaces/interfaces'
 import { Button } from "../../../../ui/button";
 import { ArrowLeft, ChevronDown, ChevronUp, Download, Edit2, RefreshCw, Save, X } from "lucide-react";
@@ -554,7 +554,7 @@ export function AlertDetails({ alert, onBack, onUpdateDisposition, setAlert, all
                           <p className="text-sm text-gray-600">
                             Field: {entry.field}
                             {entry.oldValue && entry.newValue && (
-                              <span> - Changed from "{entry.oldValue}" to "{entry.newValue}"</span>
+                              <span> {`- Changed from "{entry.oldValue}" to "{entry.newValue}"`}</span>
                             )}
                           </p>
                         )}

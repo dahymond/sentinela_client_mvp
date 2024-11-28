@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { AlertCircle, BarChart3, FileText, Settings, Shield, Users, Search, Upload, Menu, X, Download, Filter, ArrowUpDown, AlertTriangle, RefreshCw, ArrowLeft, ChevronDown, ChevronUp, Edit2, Save } from 'lucide-react'
+import {Settings, Shield, Search, Upload, Menu, X, Download, AlertTriangle, } from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent,} from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
