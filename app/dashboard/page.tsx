@@ -1,6 +1,5 @@
 'use client'
 
-import { redirect } from "next/navigation";
 import { DashboardComponent } from "../components/sections/dashboard/dashboard";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";

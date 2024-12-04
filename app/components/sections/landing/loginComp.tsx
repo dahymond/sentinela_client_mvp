@@ -100,13 +100,13 @@ export function LoginComp(
                     type="submit"
                     className="w-full bg-[#0a192f] hover:bg-[#172a46] text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                    {loading ? spinner() : 'Sign In'}
+                    {loading ? spinner() : `Sign In`}
                 </Button>
             </form>
 
             <div className="mt-8">
                 <p className="text-sm text-gray-600">
-                    Don't have an account?{' '}
+                    {`Don't have an account?`}{' '}
                     <span onClick={() => setIsLogin ? setIsLogin(false) : push('/register')} className="cursor-pointer font-medium text-blue-600 hover:text-blue-500">
                         Start Free Trial
                     </span>

@@ -19,16 +19,7 @@ import Image from 'next/image'
 export function DashboardComponent() {
   const { data: session, status } = useSession();
   const { push } = useRouter()
-  if (status === "loading") {
-    return <div className='flex-1 w-screen h-screen items-center justify-center'>Loading...</div>;
-  }
-
-  if (!session) {
-    return <p>
-      Access Denied. Please
-      <span onClick={() => push('/')} className='cursor-pointer underline text-blue-700'>log in.</span>
-    </p>;
-  }
+  
 
   const initialQueueData = [
     {
@@ -818,6 +809,17 @@ export function DashboardComponent() {
   const [escalatedAlerts, setEscalatedAlerts] = useState<any>([])
   const [columnOrder, setColumnOrder] = useState(['id', 'name', 'match', 'disposition', 'score', 'additionalAlertsCount']);
 
+  if (status === "loading") {
+    return <div className='flex-1 w-screen h-screen items-center justify-center'>Loading...</div>;
+  }
+
+  if (!session) {
+    return <p>
+      Access Denied. Please
+      <span onClick={() => push('/')} className='cursor-pointer underline text-blue-700'>log in.</span>
+    </p>;
+  }
+  
   const menuItems = [
     { icon: <Shield className="w-5 h-5" />, label: 'Alerts Dashboard', value: 'alerts' },
     { icon: <AlertTriangle className="w-5 h-5" />, label: 'Escalations', value: 'escalations' },

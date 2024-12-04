@@ -5,10 +5,6 @@ import "../../globals.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-interface ToastProviderProps {
-  children: React.ReactNode;
-}
-
 export default function ToastProvider() {
 
   return (
