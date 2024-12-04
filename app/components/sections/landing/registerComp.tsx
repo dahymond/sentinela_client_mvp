@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 import { Label } from "../../ui/label";
 import { Input } from "../../ui/input";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import Image from "next/image";
 import { toast } from "react-toastify";
 import { signIn } from "next-auth/react";
+import { spinner } from "../../ui/spinner";
 
 export default function RegisterComp(
     { setIsLogin }:
@@ -18,12 +18,13 @@ export default function RegisterComp(
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false)
-    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
     const { push } = useRouter()
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
+            setLoading(true)
             const response = await fetch("/api/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -33,7 +34,7 @@ export default function RegisterComp(
             // Check for HTTP status
             if (!response.ok) {
                 const errorText = await response.json();
-                toast.error("Registration failed: " + errorText.message);
+                toast.error(errorText.message);
                 return;
             }
             const result = await signIn("credentials", {
@@ -50,6 +51,8 @@ export default function RegisterComp(
         } catch (error) {
             console.error("Error:", error);
             toast.error("Something went wrong during registration.");
+        } finally{
+            setLoading(false)
         }
     };
     
@@ -111,7 +114,7 @@ export default function RegisterComp(
                     onClick={handleRegister}
                     className="w-full bg-[#0a192f] hover:bg-[#172a46] text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                    Start Free Trial
+                    {loading? spinner() : "Start Free Trial"}
                 </Button>
             </form>
 

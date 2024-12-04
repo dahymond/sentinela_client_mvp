@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, Dispatch, SetStateAction } from 'react'
+import { useState, Dispatch, SetStateAction } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Input } from "../../ui/input"
@@ -8,10 +8,8 @@ import { Label } from "../../ui/label"
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { signIn } from "next-auth/react";
-import Image from 'next/image'
 import { toast } from 'react-toastify'
-
-
+import { spinner } from '../../ui/spinner'
 
 export function LoginComp(
     { setIsLogin }:
@@ -20,21 +18,28 @@ export function LoginComp(
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
-    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
     const { push } = useRouter()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        const result = await signIn("credentials", {
-            redirect: false,
-            email,
-            password,
-        });
-        if (result && result.error) {
-            toast.error(result.error)
-        } else {
-            toast.success('Welcome back')
-            push("/dashboard?tab=setup");
+        setLoading(true)
+        try {
+            const result = await signIn("credentials", {
+                redirect: false,
+                email,
+                password,
+            });
+            if (result && result.error) {
+                toast.error(result.error)
+            } else {
+                toast.success('Welcome back')
+                push("/dashboard?tab=setup");
+            }
+        } catch (err: any) {
+            toast.error(err.message || 'Unable to login. Please try again')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -95,14 +100,14 @@ export function LoginComp(
                     type="submit"
                     className="w-full bg-[#0a192f] hover:bg-[#172a46] text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                    Sign In
+                    {loading ? spinner() : 'Sign In'}
                 </Button>
             </form>
 
             <div className="mt-8">
                 <p className="text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <span onClick={() =>setIsLogin? setIsLogin(false):push('/register')} className="cursor-pointer font-medium text-blue-600 hover:text-blue-500">
+                    <span onClick={() => setIsLogin ? setIsLogin(false) : push('/register')} className="cursor-pointer font-medium text-blue-600 hover:text-blue-500">
                         Start Free Trial
                     </span>
                 </p>

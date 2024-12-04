@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Settings, Shield, Search, Upload, Menu, X, Download, AlertTriangle, } from 'lucide-react'
+import { Settings, Shield, Search, Upload, Menu, X, Download, AlertTriangle, User } from 'lucide-react'
 import { Button } from "@/app/components/ui/button"
 import { Card, CardContent, } from "@/app/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
@@ -13,13 +13,14 @@ import AlertQueueTab from './alertDisplay/alertTabs/alertQueueTab'
 import AlertAnalytics from './alertDisplay/alertTabs/alertAnalytics'
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 
 export function DashboardComponent() {
   const { data: session, status } = useSession();
   const { push } = useRouter()
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <div className='flex-1 w-screen h-screen items-center justify-center'>Loading...</div>;
   }
 
   if (!session) {
@@ -1109,8 +1110,8 @@ export function DashboardComponent() {
     <div className="min-h-screen bg-gray-100 flex">
       <nav
         className={`fixed left-0 top-0 h-full bg-white shadow-lg p-4 transition-all duration-300 ease-in-out ${isMenuExpanded ? 'w-64' : 'w-20'
-          }`}
-      >
+          } z-10`}
+      > 
         <Button
           variant="ghost"
           size="icon"
@@ -1140,9 +1141,10 @@ export function DashboardComponent() {
       <div className={`flex-grow transition-all duration-300 ease-in-out ${isMenuExpanded ? 'ml-64' : 'ml-20'}`}>
         <div className="max-w-[1920px] mx-auto p-8">
           <header className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800">
-              Sentinela AI
-            </h1>
+            {/* Sentinela logo */}
+            <Image src={"/brandLogo/sentinela03.png"} width={300} height={300} alt={"sentinela logo"} className='-ml-4' />
+            
+            {/* Search Bar */}
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <input
@@ -1154,18 +1156,26 @@ export function DashboardComponent() {
                 />
                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                <span className="text-gray-800">Courtney Henry</span>
+
+              <div className="flex items-center space-x-1">
+                <div className="flex items-center justify-center w-[55px] h-[55px] bg-gray-300 rounded-md">
+                  <User className="w-[40px] h-[40px] text-gray-600 rounded-full"/>
+                </div>
+                <div className='flex flex-col gap-1 items-start justify-center bg-gray-300 m-2 px-2 pb-2 rounded-md'>
+                  <span className="text-gray-800">{session.user?.email}</span>
+                  <button
+                    className=' px-2 rounded text-white bg-blue-900 text-sm'
+                    onClick={async() => {
+                      await signOut({
+                        redirect: false, // Prevent automatic redirect by NextAuth
+                      });
+                      push('/')
+                    }
+                    }>Sign out</button>
+                </div>
               </div>
             </div>
           </header>
-
-          <div>
-            <h1>Welcome, {session.user?.name}</h1>
-            <p>Email: {session.user?.email}</p>
-            <button onClick={() => signOut()}>Logout</button>
-          </div>
 
           <main>
             {renderContent()}

@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 export async function middleware(req) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   if (!token) {
-    return new Response("Unauthorized", { status: 401 });
+    const loginUrl = new URL("/", req.url); // Redirect to the login page
+    return NextResponse.redirect(loginUrl);
   }
   return NextResponse.next();
 }
