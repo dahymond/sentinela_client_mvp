@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import SessionWrapper from "./components/wrappers/sessionwrapper";
+import ToastProvider from "./components/wrappers/toastifyWrapper";
+import "react-toastify/dist/ReactToastify.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -15,7 +18,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Sentinela AI",
-  description: "Sanctions and PEP List Screening",
+  description: "Revolutione financial crime prevention with hybrid AI technology",
 };
 
 export default function RootLayout({
@@ -24,12 +27,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <SessionWrapper>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          {children}
+          <ToastProvider />
+        </body>
+      </html>
+    </SessionWrapper>
   );
 }

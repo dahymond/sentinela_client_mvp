@@ -1,22 +1,34 @@
 'use client'
-
 import { useState } from 'react'
-import {Settings, Shield, Search, Upload, Menu, X, Download, AlertTriangle, } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent,} from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AlertDetails } from './alertDashboard/alertDetails/alertDetails'
-import AlertQueueTab from './alertDashboard/alertTabs/alertQueueTab'
-import AlertAnalytics from './alertDashboard/alertTabs/alertAnalytics'
-
+import { Settings, Shield, Search, Upload, Menu, X, Download, AlertTriangle, } from 'lucide-react'
+import { Button } from "@/app/components/ui/button"
+import { Card, CardContent, } from "@/app/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
+import { Input } from "@/app/components/ui/input"
+import { Label } from "@/app/components/ui/label"
+import { Slider } from "@/app/components/ui/slider"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
+import { AlertDetails } from './alertDisplay/alertDetails/alertDetails'
+import AlertQueueTab from './alertDisplay/alertTabs/alertQueueTab'
+import AlertAnalytics from './alertDisplay/alertTabs/alertAnalytics'
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation'
 
 
 export function DashboardComponent() {
- 
+  const { data: session, status } = useSession();
+  const { push } = useRouter()
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (!session) {
+    return <p>
+      Access Denied. Please
+      <span onClick={() => push('/')} className='cursor-pointer underline text-blue-700'>log in.</span>
+    </p>;
+  }
+
   const initialQueueData = [
     {
       id: '123456789',
@@ -811,6 +823,16 @@ export function DashboardComponent() {
     { icon: <Settings className="w-5 h-5" />, label: 'Screening Setup', value: 'setup' },
   ]
 
+  const handleColumnOrderChange = (column: string, direction: number) => {
+    const currentIndex = columnOrder.indexOf(column);
+    const newIndex = currentIndex + direction;
+    if (newIndex >= 0 && newIndex < columnOrder.length) {
+      const newOrder = [...columnOrder];
+      newOrder.splice(currentIndex, 1);
+      newOrder.splice(newIndex, 0, column);
+      setColumnOrder(newOrder);
+    }
+  };
 
   const renderAlertTable = (data: any) => (
     <div className="overflow-x-auto">
@@ -928,17 +950,6 @@ export function DashboardComponent() {
     console.log(`Updated disposition for alert ${selectedAlert.id} to ${newDisposition}`);
   };
 
-  const handleColumnOrderChange = (column: string, direction: number) => {
-    const currentIndex = columnOrder.indexOf(column);
-    const newIndex = currentIndex + direction;
-    if (newIndex >= 0 && newIndex < columnOrder.length) {
-      const newOrder = [...columnOrder];
-      newOrder.splice(currentIndex, 1);
-      newOrder.splice(newIndex, 0, column);
-      setColumnOrder(newOrder);
-    }
-  };
-
   const renderContent = () => {
     switch (activeTab) {
       case 'alerts':
@@ -989,7 +1000,7 @@ export function DashboardComponent() {
                   />
 
                   {/* Alerts Analytics */}
-                  <AlertAnalytics queueData = {queueData} escalatedAlerts={escalatedAlerts}/>
+                  <AlertAnalytics queueData={queueData} escalatedAlerts={escalatedAlerts} />
                 </Tabs>
               </>
             )}
@@ -1149,6 +1160,12 @@ export function DashboardComponent() {
               </div>
             </div>
           </header>
+
+          <div>
+            <h1>Welcome, {session.user?.name}</h1>
+            <p>Email: {session.user?.email}</p>
+            <button onClick={() => signOut()}>Logout</button>
+          </div>
 
           <main>
             {renderContent()}

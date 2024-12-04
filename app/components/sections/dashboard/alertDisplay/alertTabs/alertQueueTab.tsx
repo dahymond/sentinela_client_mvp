@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { TabsContent } from "@/components/ui/tabs"
+import { Button } from "@/app/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/app/components/ui/select"
+import { TabsContent } from "@/app/components/ui/tabs"
 import { ArrowUpDown } from "lucide-react"
 import { useState } from "react"
 

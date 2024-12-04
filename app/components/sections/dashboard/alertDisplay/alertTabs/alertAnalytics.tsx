@@ -1,6 +1,6 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts'
-import { TabsContent } from "@/components/ui/tabs"
-import { Card, CardContent } from "@/components/ui/card"
+import { TabsContent } from "@/app/components/ui/tabs"
+import { Card, CardContent } from "@/app/components/ui/card"
 
 const AlertAnalytics =({queueData, escalatedAlerts}:any)=>{
     const TOTAL_ALLOWED_SCREENINGS = 1000; // Hypothetical total number of screenings allowed
