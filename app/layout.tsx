@@ -18,7 +18,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Sentinela AI",
-  description: "Revolutione financial crime prevention with hybrid AI technology",
+  description: "Revolutionizing financial crimes prevention with hybrid AI technology",
 };
 
 export default function RootLayout({
