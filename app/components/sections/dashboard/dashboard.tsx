@@ -22,7 +22,7 @@ import {
 import { AlertDetails } from "./alertDisplay/alertDetails/alertDetails";
 import AlertQueueTab from "./alertDisplay/alertTabs/alertQueueTab";
 import AlertAnalytics from "./alertDisplay/alertTabs/alertAnalytics";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import AlertEscalation from "./alertEscalation/alertEscalation";
@@ -40,7 +40,6 @@ export function DashboardComponent({session}:{session:Session}) {
 
   const [firstName, setFirstName] = useState<string|undefined>("")
   const [lastName, setLastName] = useState<string|undefined>("")
-  const { push } = useRouter();
   const dispatch = useAppDispatch();
 
   const { all_main_alerts, main_alert } = useAppSelector(
