@@ -23,7 +23,6 @@ import { AlertDetails } from "./alertDisplay/alertDetails/alertDetails";
 import AlertQueueTab from "./alertDisplay/alertTabs/alertQueueTab";
 import AlertAnalytics from "./alertDisplay/alertTabs/alertAnalytics";
 import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import AlertEscalation from "./alertEscalation/alertEscalation";
 import AlertScreeningSetup from "./alertScreeningSetup/alertScreeningSetup";
