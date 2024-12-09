@@ -1,7 +1,6 @@
 import { baseServerURL } from "@/lib/utils";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../interceptors";
-import { AxiosError } from "axios";
 
 export const submitPII = createAsyncThunk(
   "submitPII",
@@ -9,13 +8,16 @@ export const submitPII = createAsyncThunk(
     try {
       const { data } = await axiosInstance.post(
         `${baseServerURL}/sentinela/fuzzy_match_mvp_alt`,
-        PIIDetails
+        PIIDetails,
+        { withCredentials: true }
       );
       return data;
-    } catch (err:any) {
+    } catch (err: any) {
       return thunkApi.rejectWithValue(
-        err?.response?.data?.error || err.message || 'Something went wrong. Please try again'
-      )
+        err?.response?.data?.error ||
+          err.message ||
+          "Something went wrong. Please try again"
+      );
     }
   }
 );

@@ -4,7 +4,6 @@ import axiosInstance from "../interceptors";
 import { submitPII } from "./screeningSetUpSlice";
 import {
   APIResponse,
-  ResultState,
   MainAlert,
 } from "@/app/components/interfaces/interfaces";
 

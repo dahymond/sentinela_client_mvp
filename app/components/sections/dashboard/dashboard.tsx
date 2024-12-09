@@ -34,9 +34,9 @@ import {
   getMainAlert,
   updatealertsSlice,
 } from "@/store/slices/alertsSlice";
+import { Session } from "next-auth";
 
-export function DashboardComponent() {
-  const { data: session, status } = useSession();
+export function DashboardComponent({session}:{session:Session}) {
 
   const [firstName, setFirstName] = useState<string|undefined>("")
   const [lastName, setLastName] = useState<string|undefined>("")
@@ -79,19 +79,7 @@ export function DashboardComponent() {
     );
   }
 
-  if (!session) {
-    return (
-      <p>
-        Access Denied. Please
-        <span
-          onClick={() => push("/")}
-          className="cursor-pointer underline text-blue-700"
-        >
-          log in.
-        </span>
-      </p>
-    );
-  }
+  
 
   const menuItems: {
     icon: ReactElement;
@@ -455,9 +443,9 @@ export function DashboardComponent() {
                     className=" px-2 rounded text-white bg-blue-900 text-sm"
                     onClick={async () => {
                       await signOut({
-                        redirect: false, // Prevent automatic redirect by NextAuth
+                        redirect: true, // Prevent automatic redirect by NextAuth
                       });
-                      push("/");
+                      // push("/");
                     }}
                   >
                     Sign out
