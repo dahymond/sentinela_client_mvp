@@ -7,9 +7,8 @@ export const submitPII = createAsyncThunk(
   async (PIIDetails: Partial<ScreeningSetUpState>, thunkApi) => {
     try {
       const { data } = await axiosInstance.post(
-        `${baseServerURL}/sentinela/fuzzy_match_mvp_alt`,
+        `/sentinela/fuzzy_match_mvp_alt`,
         PIIDetails,
-        { withCredentials: true }
       );
       return data;
     } catch (err: any) {
