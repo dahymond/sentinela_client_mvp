@@ -9,6 +9,8 @@ import {
   Download,
   AlertTriangle,
   User,
+  ArrowLeftCircle,
+  ArrowRightCircle,
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
@@ -41,7 +43,7 @@ export function DashboardComponent({ session }: { session: Session }) {
   const [lastName, setLastName] = useState<string | undefined>("");
   const dispatch = useAppDispatch();
 
-  const { all_main_alerts, main_alert } = useAppSelector(
+  const { all_main_alerts, main_alert, main_alert_loading } = useAppSelector(
     (store) => store.alertSlice
   );
   const [activeTab, setActiveTab] = useState<ActiveTabsType>("alerts");
@@ -105,13 +107,13 @@ export function DashboardComponent({ session }: { session: Session }) {
   const renderAlertTable = (data: any) => (
     <div className="overflow-x-auto">
       {data?.length > 0 && (
-        <table className="w-full">
-          <thead>
-            <tr className="text-left text-gray-600 border-b">
+        <table className="my-5 w-full">
+          <thead className="">
+            <tr className="text-left text-gray-600 border-y">
               {columnOrder.map((column) => (
                 <th key={column} className="pb-3 font-medium">
-                  <div className="flex items-center">
-                    <span className="mr-2">
+                  <div className="flex flex-col justify-center items-center">
+                    <span className="mr-2 mt-4 text-sm font-bold text-center">
                       {column === "id"
                         ? "Alert ID"
                         : column === "name"
@@ -126,14 +128,15 @@ export function DashboardComponent({ session }: { session: Session }) {
                         ? "Additional Alerts"
                         : column}
                     </span>
-                    <div className="flex flex-col">
+                    <div className="flex -ml-3 items-center">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleColumnOrderChange(column, -1)}
                         disabled={columnOrder.indexOf(column) === 0}
+                        className=""
                       >
-                        ↑
+                        <ArrowLeftCircle/>
                       </Button>
                       <Button
                         variant="ghost"
@@ -142,8 +145,9 @@ export function DashboardComponent({ session }: { session: Session }) {
                         disabled={
                           columnOrder.indexOf(column) === columnOrder.length - 1
                         }
+                        className="-ml-3"
                       >
-                        ↓
+                        <ArrowRightCircle/>
                       </Button>
                     </div>
                   </div>
@@ -152,58 +156,75 @@ export function DashboardComponent({ session }: { session: Session }) {
             </tr>
           </thead>
 
-          <tbody>
+          <tbody
+            style={{
+              cursor: main_alert_loading ? "wait" : "pointer",
+            }}
+          >
             {data.map(
-              (row: {
-                id: number;
-                disposition: string;
-                name: string;
-                score: number;
-                sanctions_source: string;
-                additionalAlertsCount: number;
-              }) => (
-                <tr
-                  key={row.id}
-                  className="border-b last:border-b-0 hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-                  onClick={() => dispatch(getMainAlert(row.id))}
-                >
-                  {columnOrder.map((column) => (
-                    <td key={column} className="py-4">
-                      {column === "disposition" ? (
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            row.disposition === "Pending Review"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : row.disposition === "False Positive"
-                              ? "bg-green-100 text-green-800"
-                              : row.disposition === "Escalated"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-blue-100 text-blue-800"
-                          }`}
-                        >
-                          {row.disposition}
-                        </span>
-                      ) : column === "score" ? (
-                        <div className="flex items-center">
-                          <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                            <div
-                              className="bg-gradient-to-r from-green-400 to-red-500 h-full rounded-full"
-                              style={{ width: `${row.score}%` }}
-                            ></div>
+              (
+                row: {
+                  id: number;
+                  disposition: string;
+                  name: string;
+                  score: number;
+                  sanctions_source: string;
+                  additionalAlertsCount: number;
+                },
+                i: number
+              ) => {
+                const iswholenumber = i % 2;
+                return (
+                  <tr
+                    key={row.id}
+                    // className={`border-b last:border-b-0 ${
+                    className={`${
+                      iswholenumber ? "bg-white" : "bg-gray-100"
+                    } ${
+                      main_alert_loading
+                        ? "pointer-events-none opacity-50"
+                        : "opacity-100"
+                    } hover:bg-gray-200 transition-colors duration-150`}
+                    onClick={() => dispatch(getMainAlert(row.id))}
+                  >
+                    {columnOrder.map((column) => (
+                      <td key={column} className="py-4 text-center">
+                        {column === "disposition" ? (
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs ${
+                              row.disposition === "Pending Review"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : row.disposition === "False Positive"
+                                ? "bg-green-100 text-green-800"
+                                : row.disposition === "Escalated"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
+                            {row.disposition}
+                          </span>
+                        ) : column === "score" ? (
+                          <div className="flex items-center justify-center">
+                            <div className="w-[50px] bg-gray-200 rounded-full h-2 mr-2">
+                              <div
+                                className="bg-gradient-to-r from-green-400 to-red-500 h-full rounded-full"
+                                style={{ width: `${row.score}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-sm">{row.score}</span>
                           </div>
-                          <span className="text-sm">{row.score}</span>
-                        </div>
-                      ) : column === "additionalAlertsCount" ? (
-                        <span className="text-sm">
-                          {row.additionalAlertsCount}
-                        </span>
-                      ) : (
-                        row[column]
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              )
+                        ) : column === "additionalAlertsCount" ? (
+                          <span className="text-sm">
+                            {row.additionalAlertsCount}
+                          </span>
+                        ) : (
+                          row[column]
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              }
             )}
           </tbody>
         </table>
@@ -303,6 +324,7 @@ export function DashboardComponent({ session }: { session: Session }) {
                     </Button>
                   </div>
                 </div>
+                
                 <Tabs defaultValue="queue">
                   <TabsList className="mb-4">
                     <TabsTrigger value="queue">Alerts Queue</TabsTrigger>
@@ -396,14 +418,14 @@ export function DashboardComponent({ session }: { session: Session }) {
         {/* MAIN SECTION */}
         <div className="max-w-[1920px] mx-auto p-8">
           {/* HEADER WITH LOGO, SEARCH BAR AND LOGOUT*/}
-          <header className="flex justify-between items-center mb-8">
+          <header className="flex flex-col lg:flex-row lg:justify-between gap-3 items-center mb-8">
             {/* Sentinela logo */}
             <Image
               src={"/brandLogo/sentinela03.png"}
               width={300}
               height={300}
               alt={"sentinela logo"}
-              className="-ml-4"
+              className="-ml-4 mb-3"
             />
 
             {/* Search Bar */}
@@ -420,13 +442,13 @@ export function DashboardComponent({ session }: { session: Session }) {
               </div>
 
               {/* PROFILE PIC, PROFILE NAME AND LOGOUT */}
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-1 pr-3">
                 <div className="flex items-center justify-center w-[55px] h-[55px] bg-white rounded-full">
                   <User className="w-[40px] h-[40px] text-gray-600 rounded-full" />
                 </div>
-                <div className="flex flex-col gap-1 items-start justify-center bg-gray-50 m-2 px-2 pb-2 rounded-md">
-                  <span className="text-gray-800">
-                    {session.user?.firstName}
+                <div className="flex md:flex-row flex-col gap-1 md:items-center items-end justify-center bg-gray-50 m-2 px-2 pb-2 rounded-md">
+                  <span className="text-gray-800 text-xs font-bold text-end">
+                    {session.user?.firstName} {session?.user?.lastName}
                   </span>
                   <button
                     className=" px-2 rounded text-white bg-blue-900 text-sm"

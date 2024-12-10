@@ -1,4 +1,5 @@
 import { Button } from "@/app/components/ui/button";
+import LogoHeartBeat from "@/app/components/ui/logoheartbeart";
 import {
   Select,
   SelectContent,
@@ -7,12 +8,13 @@ import {
   SelectValue,
 } from "@/app/components/ui/select";
 import { TabsContent } from "@/app/components/ui/tabs";
+import { useAppSelector } from "@/store/hook";
 import { ArrowUpDown, Hammer } from "lucide-react";
 import { useState } from "react";
 
 const AlertQueueTab = ({
-  columnOrder,
-  handleColumnOrderChange,
+  // columnOrder,
+  // handleColumnOrderChange,
   queueData,
   searchQuery,
   renderAlertTable,
@@ -22,7 +24,10 @@ const AlertQueueTab = ({
   const [sortBy, setSortBy] = useState("id");
   const [sortOrder, setSortOrder] = useState("asc");
 
-//   console.log("alertQueueComp", queueData)
+  const { all_main_alerts_loading } = useAppSelector(
+    (store) => store.alertSlice
+  );
+  //   console.log("alertQueueComp", queueData)
   const filteredAndSortedQueueData = queueData
     .filter(
       (alert: any) =>
@@ -35,7 +40,7 @@ const AlertQueueTab = ({
       if (sortBy === "id") {
         return sortOrder === "asc"
           ? Number(a.id) - Number(b.id)
-          : Number(b.id) - Number(a.id)
+          : Number(b.id) - Number(a.id);
       } else if (sortBy === "name") {
         return sortOrder === "asc"
           ? a.name.localeCompare(b.name)
@@ -55,6 +60,7 @@ const AlertQueueTab = ({
   return (
     <TabsContent value="queue">
       <div className="mb-4 flex justify-between items-center">
+        {/* All Disposition, Alert Id, Ascending */}
         <div className="flex items-center space-x-2">
           <Select
             value={filterDisposition}
@@ -90,13 +96,16 @@ const AlertQueueTab = ({
             {sortOrder === "asc" ? "Ascending" : "Descending"}
           </Button>
         </div>
+        {/* Clear filters */}
         <div className="flex items-center space-x-2">
           <Button variant="outline" onClick={() => setFilterDisposition("all")}>
             Clear Filters
           </Button>
         </div>
       </div>
-      <div className="mb-4">
+
+      {/* Column Order */}
+      {/* <div className="mb-4">
         <h3 className="text-lg font-semibold mb-2">Column Order</h3>
         <div className="flex flex-wrap gap-2">
           {columnOrder.map((column: any, index: any) => (
@@ -121,10 +130,15 @@ const AlertQueueTab = ({
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
-      {filteredAndSortedQueueData.length > 0 ? (
+      {filteredAndSortedQueueData.length > 0 && !all_main_alerts_loading ? (
         renderAlertTable(filteredAndSortedQueueData)
+      ) : all_main_alerts_loading ? (
+        <div className="flex flex-col gap-1 items-center justify-center w-full h-full mt-10">
+          <LogoHeartBeat/>
+          <p className="text-sm">...fetching alerts</p>
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center gap-3 text-gray-600 min-h-40 w-full">
           <div className="flex items-center gap-3">

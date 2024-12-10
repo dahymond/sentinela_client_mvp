@@ -150,6 +150,7 @@ const alertsSlice = createSlice({
     builder.addCase(
       getMainAlert.fulfilled,
       (state, action: PayloadAction<any>) => {
+        state.main_alert_loading = false
         // console.log(action.payload);
         state.main_alert = action?.payload?.main_alert;
         state.additional_alerts = action?.payload?.additional_alerts;
