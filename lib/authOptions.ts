@@ -4,6 +4,7 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { NextAuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { baseClientURL } from "./utils";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -54,6 +55,17 @@ export const authOptions: NextAuthOptions = {
       session.user.lastName = lastName;
       // }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // Allow external URLs only if they are from a trusted domain
+      const allowedDomains = [baseClientURL, "http://127.0.0.1:3000"]; // Add other trusted domains if needed
+
+      if (allowedDomains.some((domain) => url.startsWith(domain))) {
+        return url; // Redirect to the callback URL if it's in the allowed domains
+      }
+
+      // Default to baseUrl for safety
+      return baseUrl;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

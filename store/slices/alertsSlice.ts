@@ -1,4 +1,3 @@
-import { baseServerURL } from "@/lib/utils";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axiosInstance from "../interceptors";
 import { submitPII } from "./screeningSetUpSlice";
@@ -44,7 +43,7 @@ export const getAllAlerts = createAsyncThunk(
   async (_, thunkApi) => {
     try {
       const { data } = await axiosInstance.get(
-        `${baseServerURL}/sentinela/alerts/`
+        `/sentinela/alerts/`
       );
       return data;
     } catch (err: any) {
@@ -62,7 +61,7 @@ export const getMainAlert = createAsyncThunk(
   async (alertId: number, thunkApi) => {
     try {
       const { data } = await axiosInstance.get(
-        `${baseServerURL}/sentinela/alerts/main/${alertId}`
+        `/sentinela/alerts/main/${alertId}`
       );
       //   console.log(data);
       return data;
@@ -81,7 +80,7 @@ export const getAdditionalAlert = createAsyncThunk(
   async (alertId: number, thunkApi) => {
     try {
       const { data } = await axiosInstance.get(
-        `${baseServerURL}/sentinela/alerts/additional/${alertId}`
+        `/sentinela/alerts/additional/${alertId}`
       );
       //   console.log(data);
       return data;

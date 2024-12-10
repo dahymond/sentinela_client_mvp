@@ -47,7 +47,7 @@ const Dashboard = () => {
 
   if (!session) {
     return (
-      <div className="flex w-screen h-screen items-center justify-center bg-gray-200">
+      <div className="flex w-screen h-screen gap-2 items-center justify-center bg-gray-200">
         Access Denied. Please{" "}
         <span
           onClick={() => push("/")}

@@ -34,11 +34,11 @@ import {
   updatealertsSlice,
 } from "@/store/slices/alertsSlice";
 import { Session } from "next-auth";
+import { baseClientURL } from "@/lib/utils";
 
-export function DashboardComponent({session}:{session:Session}) {
-
-  const [firstName, setFirstName] = useState<string|undefined>("")
-  const [lastName, setLastName] = useState<string|undefined>("")
+export function DashboardComponent({ session }: { session: Session }) {
+  const [firstName, setFirstName] = useState<string | undefined>("");
+  const [lastName, setLastName] = useState<string | undefined>("");
   const dispatch = useAppDispatch();
 
   const { all_main_alerts, main_alert } = useAppSelector(
@@ -64,20 +64,10 @@ export function DashboardComponent({session}:{session:Session}) {
     dispatch(getAllAlerts());
   }, [dispatch]);
 
-  useEffect(()=>{
-    setFirstName(session?.user?.firstName)
-    setLastName(session?.user?.lastName)
-  },[session])
-
-  if (status === "loading") {
-    return (
-      <div className="flex-1 w-screen h-screen items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
-
-  
+  useEffect(() => {
+    setFirstName(session?.user?.firstName);
+    setLastName(session?.user?.lastName);
+  }, [session]);
 
   const menuItems: {
     icon: ReactElement;
@@ -222,7 +212,7 @@ export function DashboardComponent({session}:{session:Session}) {
   );
 
   const handleUpdateDisposition = (newDisposition: string) => {
-    if(!main_alert) return;
+    if (!main_alert) return;
 
     const timestamp = new Date().toISOString();
     const newAuditLogEntry = {
@@ -242,7 +232,7 @@ export function DashboardComponent({session}:{session:Session}) {
         auditLog: [newAuditLogEntry, ...main_alert?.details?.auditLog],
       },
     };
-    dispatch(updatealertsSlice({ name: "main_alert", value: updatedAlert }))
+    dispatch(updatealertsSlice({ name: "main_alert", value: updatedAlert }));
 
     // // Update the alert in the all_main_alerts
     // const updatedQueueData = all_main_alerts.map((alert) =>
@@ -280,14 +270,13 @@ export function DashboardComponent({session}:{session:Session}) {
             {main_alert ? (
               <AlertDetails
                 alert={main_alert}
-                onBack={() =>{
+                onBack={() => {
                   dispatch(
                     updatealertsSlice({ name: "main_alert", value: null })
-                  )
+                  );
                   //refresh alert list while navigating backwards
-                  dispatch(getAllAlerts())
-                }
-                }
+                  dispatch(getAllAlerts());
+                }}
                 onUpdateDisposition={handleUpdateDisposition}
                 allAlerts={[...all_main_alerts, ...escalatedAlerts]}
               />
@@ -436,14 +425,16 @@ export function DashboardComponent({session}:{session:Session}) {
                   <User className="w-[40px] h-[40px] text-gray-600 rounded-full" />
                 </div>
                 <div className="flex flex-col gap-1 items-start justify-center bg-gray-50 m-2 px-2 pb-2 rounded-md">
-                  <span className="text-gray-800">{session.user?.firstName}</span>
+                  <span className="text-gray-800">
+                    {session.user?.firstName}
+                  </span>
                   <button
                     className=" px-2 rounded text-white bg-blue-900 text-sm"
                     onClick={async () => {
                       await signOut({
-                        redirect: true, // Prevent automatic redirect by NextAuth
+                        redirect: true,
+                        callbackUrl: baseClientURL,
                       });
-                      // push("/");
                     }}
                   >
                     Sign out

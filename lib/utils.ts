@@ -9,4 +9,4 @@ export function cn(...inputs: ClassValue[]) {
 export const baseServerURL = `https://sentinela-eqan.onrender.com`; //live
 
 // export const baseClientURL = `http://127.0.0.1:3000`; //localhost
-// export const baseClientURL = `https://sentinelamvp.netlify.app`; //live
+export const baseClientURL = `https://sentinelamvp.netlify.app`; //live
