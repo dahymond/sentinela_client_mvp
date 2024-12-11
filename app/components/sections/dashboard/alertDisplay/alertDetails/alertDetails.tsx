@@ -32,6 +32,7 @@ import { ScrollArea } from "../../../../ui/scroll-area";
 import { Separator } from "../../../../ui/separator";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { updatealertsSlice } from "@/store/slices/alertsSlice";
+import { isValidDateString, readableSanctionString } from "@/lib/utils";
 
 export function AlertDetails({
   alert,
@@ -269,7 +270,7 @@ export function AlertDetails({
           </CardHeader>
           <CardContent>
             <p className="text-lg font-semibold">
-              {alert?.details?.watchlistDetails?.name}
+              {alert?.details?.customerDetails?.name}
             </p>
           </CardContent>
         </Card>
@@ -287,7 +288,9 @@ export function AlertDetails({
                   style={{ width: `${alert.score}%` }}
                 ></div>
               </div>
-              <span className="text-lg font-semibold">{alert.score}</span>
+              <span className="text-lg font-semibold">
+                {Number(alert?.score).toFixed(0)}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -298,7 +301,11 @@ export function AlertDetails({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">{alert.alertDateTime}</p>
+            <p className="text-xs font-semibold">
+              {isValidDateString(alert?.alertDateTime)
+                ? new Date(alert?.alertDateTime).toUTCString()
+                : "N/A"}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -410,7 +417,8 @@ export function AlertDetails({
                       </h4>
                       <p className="text-gray-600 mb-2">
                         <span className="font-medium">Source:</span>{" "}
-                        {alert.sanctions_source}
+                        {readableSanctionString(alert.sanctions_source) ||
+                          alert.sanctions_source}
                       </p>
                       {alert?.details?.watchlistDetails?.notes && (
                         <p className="text-gray-600 mb-2">
@@ -919,7 +927,7 @@ export function AlertDetails({
                     <h4 className="text-sm  mb-2">
                       <span className="font-semibold">Phone Numbers</span>
                       <span className="list-disc pl-5 mb-4">
-                        {`${alert?.details?.watchlistDetails?.phone || 'N/A'}`}
+                        {`${alert?.details?.watchlistDetails?.phone || "N/A"}`}
                       </span>
                     </h4>
                   </div>

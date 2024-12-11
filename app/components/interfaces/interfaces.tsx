@@ -207,7 +207,7 @@ export interface WatchlistDetails {
   countryOfResidence?: string;
   dob?: string;
   name?: string;
-  phone:string;
+  phone: string;
   nationalID?: string;
   passportNumber?: string;
   referents?: string;
@@ -246,7 +246,12 @@ export interface AlertDetails {
 export interface MainAlert {
   id: string;
   name: string;
-  sanctions_source: string;
+  sanctions_source:
+    | "eu_fsf"
+    | "us_ofac_sdn"
+    | "fr_tresor_gels_avoir"
+    | "gb_hmt_sanctions"
+    | "un_sc_sanctions";
   disposition: string;
   score: number;
   alertDateTime: string;

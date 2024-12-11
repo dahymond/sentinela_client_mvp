@@ -76,3 +76,21 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.success-background {
+  background-color: rgb(14, 14, 35) !important;
+  color: #fff !important;
+}
+
+.success-progress-bar {
+  background-color: lightblue !important;
+}
+
+.error-background {
+  background-color: rgb(86, 14, 2) !important;
+  color: #fff !important;
+}
+
+.error-progress-bar {
+  background-color: rgb(216, 53, 53) !important;
+}

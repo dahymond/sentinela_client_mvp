@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import SessionWrapper from "./components/wrappers/sessionwrapper";
 import ToastProvider from "./components/wrappers/toastifyWrapper";
-import "react-toastify/dist/ReactToastify.css";
 import Providers from "@/store/providers";
 
 const geistSans = localFont({
