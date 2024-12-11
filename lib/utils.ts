@@ -37,27 +37,26 @@ export const useToast = () => {
   };
 };
 
-export function isValidDateString(dateString:string) {
+export function isValidDateString(dateString: string) {
   const date = new Date(dateString);
   return !isNaN(date.getTime());
 }
 
-export const readableSanctionString = (
-  sanction:
-    | "eu_fsf"
-    | "us_ofac_sdn"
-    | "fr_tresor_gels_avoir"
-    | "gb_hmt_sanctions"
-    |"un_sc_sanctions"
-) => {
+export type sanctionsType =
+  | "eu_fsf"
+  | "us_ofac_sdn"
+  | "fr_tresor_gels_avoir"
+  | "gb_hmt_sanctions"
+  | "un_sc_sanctions";
+
+export const readableSanctionString = (sanction: sanctionsType) => {
   const mapping = {
-    eu_fsf:'Eu FSF List',
+    eu_fsf: "Eu FSF List",
     us_ofac_sdn: "US OFAC SDN",
     fr_tresor_gels_avoir: "France Tresor List",
     gb_hmt_sanctions: "Great Britain HTM Sanction",
-    un_sc_sanctions:"UN SC Sanctions"
-  }
+    un_sc_sanctions: "UN SC Sanctions",
+  };
 
-  return mapping[sanction]
+  return mapping[sanction];
 };
-

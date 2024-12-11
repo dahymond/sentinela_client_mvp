@@ -36,7 +36,11 @@ import {
   updatealertsSlice,
 } from "@/store/slices/alertsSlice";
 import { Session } from "next-auth";
-import { baseClientURL } from "@/lib/utils";
+import {
+  baseClientURL,
+  readableSanctionString,
+  sanctionsType,
+} from "@/lib/utils";
 
 export function DashboardComponent({ session }: { session: Session }) {
   const [firstName, setFirstName] = useState<string | undefined>("");
@@ -136,7 +140,7 @@ export function DashboardComponent({ session }: { session: Session }) {
                         disabled={columnOrder.indexOf(column) === 0}
                         className=""
                       >
-                        <ArrowLeftCircle/>
+                        <ArrowLeftCircle />
                       </Button>
                       <Button
                         variant="ghost"
@@ -147,7 +151,7 @@ export function DashboardComponent({ session }: { session: Session }) {
                         }
                         className="-ml-3"
                       >
-                        <ArrowRightCircle/>
+                        <ArrowRightCircle />
                       </Button>
                     </div>
                   </div>
@@ -168,7 +172,7 @@ export function DashboardComponent({ session }: { session: Session }) {
                   disposition: string;
                   name: string;
                   score: number;
-                  sanctions_source: string;
+                  sanctions_source: sanctionsType;
                   additionalAlertsCount: number;
                 },
                 i: number
@@ -178,9 +182,7 @@ export function DashboardComponent({ session }: { session: Session }) {
                   <tr
                     key={row.id}
                     // className={`border-b last:border-b-0 ${
-                    className={`${
-                      iswholenumber ? "bg-white" : "bg-gray-100"
-                    } ${
+                    className={`${iswholenumber ? "bg-white" : "bg-gray-100"} ${
                       main_alert_loading
                         ? "pointer-events-none opacity-50"
                         : "opacity-100"
@@ -211,14 +213,20 @@ export function DashboardComponent({ session }: { session: Session }) {
                                 style={{ width: `${row.score}%` }}
                               ></div>
                             </div>
-                            <span className="text-sm">{row.score}</span>
+                            <span className="text-sm">
+                              {Number(row?.score)?.toFixed(0)}
+                            </span>
                           </div>
                         ) : column === "additionalAlertsCount" ? (
                           <span className="text-sm">
                             {row.additionalAlertsCount}
                           </span>
+                        ) : column === "sanctions_source" ? (
+                          <span className="text-xs">
+                            {readableSanctionString(row?.sanctions_source)}
+                          </span>
                         ) : (
-                          row[column]
+                          <span className="text-sm">{row[column]}</span>
                         )}
                       </td>
                     ))}
