@@ -26,7 +26,7 @@ export function AdditionalAlertsQueue({ alerts }: { alerts: MainAlert[] }) {
                 {readableSanctionString(alert.sanctions_source) ||
                   alert.sanctions_source}
               </span>
-              <span>Risk Score: {alert.score}</span>
+              <span>Risk Score: {Number(alert?.score)?.toFixed(0)}</span>
               <span className="text-xs">
                 Alert Date:{" "}
                 {isValidDateString(alert?.alertDateTime)

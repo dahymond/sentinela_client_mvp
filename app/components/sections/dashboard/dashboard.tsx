@@ -200,6 +200,8 @@ export function DashboardComponent({ session }: { session: Session }) {
                                 ? "bg-green-100 text-green-800"
                                 : row.disposition === "Escalated"
                                 ? "bg-red-100 text-red-800"
+                                : row.disposition === "Inconclusive"
+                                ? "bg-purple-200 text-red-900"
                                 : "bg-blue-100 text-blue-800"
                             }`}
                           >
