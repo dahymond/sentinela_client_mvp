@@ -10,6 +10,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/app/components/ui/tabs";
+import { useToast } from "@/lib/utils";
 
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import {
@@ -38,6 +39,8 @@ const AlertScreeningSetup = ({
   } = useAppSelector((store) => store.screeningSetup);
 
   const { submit_alert_loading } = useAppSelector((store) => store.alertSlice);
+  const toast = useToast()
+  
   const onChange = ({ target }: any) => {
     const { name, value } = target;
     dispatch(updateScreeningSetUp({ name, value }));
@@ -59,6 +62,8 @@ const AlertScreeningSetup = ({
     if (result.meta.requestStatus === "fulfilled") {
       setActiveTab("alerts");
     } else {
+      setActiveTab("alerts");
+      toast('error', 'Entity not on sanctions list')
       console.log(result.payload);
     }
   };
