@@ -1,7 +1,6 @@
 "use client";
 import { ReactElement, useEffect, useState } from "react";
 import {
-  Settings,
   Shield,
   Search,
   Menu,
@@ -11,6 +10,7 @@ import {
   User,
   ArrowLeftCircle,
   ArrowRightCircle,
+  SearchIcon,
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
@@ -77,6 +77,11 @@ export function DashboardComponent({ session }: { session: Session }) {
     value: "alerts" | "escalations" | "setup";
   }[] = [
     {
+      icon: <SearchIcon className="w-5 h-5" />,
+      label: "Screening Search",
+      value: "setup",
+    },
+    {
       icon: <Shield className="w-5 h-5" />,
       label: "Alerts Dashboard",
       value: "alerts",
@@ -85,11 +90,6 @@ export function DashboardComponent({ session }: { session: Session }) {
       icon: <AlertTriangle className="w-5 h-5" />,
       label: "Escalations",
       value: "escalations",
-    },
-    {
-      icon: <Settings className="w-5 h-5" />,
-      label: "Screening Setup",
-      value: "setup",
     },
   ];
 
@@ -324,7 +324,7 @@ export function DashboardComponent({ session }: { session: Session }) {
                     </Button>
                   </div>
                 </div>
-                
+
                 <Tabs defaultValue="queue">
                   <TabsList className="mb-4">
                     <TabsTrigger value="queue">Alerts Queue</TabsTrigger>
