@@ -62,7 +62,7 @@ const AlertScreeningSetup = ({
     if (result.meta.requestStatus === "fulfilled") {
       setActiveTab("alerts");
     } else {
-      toast('error', 'Entity not on sanctions list')
+      toast('error', result?.payload?.toString())
       console.log(result.payload);
     }
   };
