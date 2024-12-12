@@ -141,10 +141,12 @@ const AlertQueueTab = ({
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center gap-3 text-gray-600 min-h-40 w-full">
+          
           <div className="flex items-center gap-3">
             <h4 className="text-xl">No alerts to display</h4>
             <Hammer />
           </div>
+          
           <div>
             <p>
               Click{" "}

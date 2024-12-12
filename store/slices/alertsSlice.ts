@@ -1,14 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axiosInstance from "../interceptors";
 import { submitPII } from "./screeningSetUpSlice";
-import {
-  APIResponse,
-  MainAlert,
-} from "@/app/components/interfaces/interfaces";
+import { APIResponse, MainAlert } from "@/app/components/interfaces/interfaces";
 
 type AlertsSliceType = {
   all_main_alerts: Omit<MainAlert, "details">[];
   main_alert: MainAlert | null;
+  main_alert_mini_details: Omit<MainAlert, "details"> | null;
   additional_alerts: MainAlert[];
 
   // pending loading
@@ -27,6 +25,7 @@ type AlertsSliceType = {
 const initialState: AlertsSliceType = {
   all_main_alerts: [],
   main_alert: null, // Will hold the main alert data
+  main_alert_mini_details: null,
   additional_alerts: [], // Initially empty
   all_main_alerts_loading: false,
   main_alert_loading: false,
@@ -42,9 +41,7 @@ export const getAllAlerts = createAsyncThunk(
   "getAllAlerts",
   async (_, thunkApi) => {
     try {
-      const { data } = await axiosInstance.get(
-        `/sentinela/alerts/`
-      );
+      const { data } = await axiosInstance.get(`/sentinela/alerts/`);
       return data;
     } catch (err: any) {
       return thunkApi.rejectWithValue(
@@ -150,9 +147,10 @@ const alertsSlice = createSlice({
     builder.addCase(
       getMainAlert.fulfilled,
       (state, action: PayloadAction<any>) => {
-        state.main_alert_loading = false
+        state.main_alert_loading = false;
         // console.log(action.payload);
         state.main_alert = action?.payload?.main_alert;
+        state.main_alert_mini_details = action?.payload?.main_alert;
         state.additional_alerts = action?.payload?.additional_alerts;
       }
     );

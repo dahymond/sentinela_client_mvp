@@ -33,6 +33,7 @@ import { Separator } from "../../../../ui/separator";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { updatealertsSlice } from "@/store/slices/alertsSlice";
 import { isValidDateString, readableSanctionString } from "@/lib/utils";
+import { MainAlertQueue } from "./mainAlertQueue";
 
 export function AlertDetails({
   alert,
@@ -56,65 +57,7 @@ export function AlertDetails({
   const [isWatchlistDetailsExpanded, setIsWatchlistDetailsExpanded] =
     useState(true);
 
-  // const additional_alerts = allAlerts.filter(a =>
-  //   a.id !== alert.id &&
-  //   (a.name === alert.name || a.details.customerDetails.id === alert.details.customerDetails.idNumber)
-  // ).concat([
-  //   {
-  //     ...alert,
-  //     id: '987654321',
-  //     sanctions_source: 'EU Sanctions List',
-  //     disposition: 'Pending Review',
-  //     score: 65,
-  //     alertDateTime: '2023-06-01 10:30 AM',
-  //     additionalAlertsCount: 2,
-  //     details: {
-  //       ...alert.details,
-  //       watchlistDetails: {
-  //         location: 'Brussels, Belgium',
-  //         notes: 'Financial Sanctions',
-  //         source: 'EU Sanctions List',
-  //         problematicTags: ['Financial Crime', 'Money Laundering']
-  //       },
-  //       watchlistDetails: {
-  //         ...alert.details.watchlistDetails,
-  //         name: `${alert.name} (EU)`,
-  //         nationality: 'Belgian',
-  //         source: 'EU',
-  //         reason: 'Financial Sanctions'
-  //       },
-  //       dispositionOverview: `${alert.name} has been identified on the EU Sanctions List for potential involvement in financial crimes.`,
-  //       alertNarrative: `This alert was generated due to a match with the EU Sanctions List. The individual shares the same name and similar identifying information with a person sanctioned for financial crimes. Further investigation is required to confirm the match and determine appropriate action.`
-  //     }
-  //   },
-  //   {
-  //     ...alert,
-  //     id: '876543210',
-  //     sanctions_source: 'Interpol Red Notice',
-  //     disposition: 'False Positive',
-  //     score: 40,
-  //     alertDateTime: '2023-05-28 02:15 PM',
-  //     additionalAlertsCount: 2,
-  //     details: {
-  //       ...alert.details,
-  //       watchlistDetails: {
-  //         location: 'Global',
-  //         notes: 'International Warrant',
-  //         source: 'Interpol Red Notice',
-  //         problematicTags: ['Fugitive', 'Fraud']
-  //       },
-  //       watchlistDetails: {
-  //         ...alert.details.watchlistDetails,
-  //         name: `${alert.name} (Interpol)`,
-  //         nationality: 'Unknown',
-  //         source: 'Interpol',
-  //         reason: 'International Warrant'
-  //       },
-  //       dispositionOverview: `${alert.name} was initially flagged due to a name match with an individual on Interpol's Red Notice list.`,
-  //       alertNarrative: `This alert was triggered by a name similarity with an individual on Interpol's Red Notice list. After thorough investigation, it was determined that this is a false positive. The date of birth, nationality, and other identifying information do not match the listed individual.`
-  //     }
-  //   }
-  // ]);
+  const [activeAlertIndex, setActiveAlertIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setEditedOverview(alert?.details?.dispositionOverview);
@@ -208,10 +151,9 @@ export function AlertDetails({
     console.log(`Exporting alert areas: ${selectedAreas.join(", ")}`);
   };
 
-  // console.log(editedOverview)
-
   return (
     <div className="bg-white shadow-lg rounded-lg p-6">
+      {/* Back button, Alert Title, Refresh Btn, Areas To Export, Export */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" onClick={onBack}>
@@ -310,11 +252,20 @@ export function AlertDetails({
         </Card>
       </div>
 
-      {/* Second Section: Additional Alert*/}
-      <AdditionalAlertsQueue alerts={additional_alerts} />
+      {/* Second Section: Few Main Alert details*/}
+      <MainAlertQueue
+        activeAlertIndex={activeAlertIndex}
+        setActiveAlertIndex={setActiveAlertIndex}
+      />
 
-      {/* Third Section: Alerts Overview Section */}
+      {/* Third Section: Few Additional Alert details*/}
+      <AdditionalAlertsQueue
+        alerts={additional_alerts}
+        activeAlertIndex={activeAlertIndex}
+        setActiveAlertIndex={setActiveAlertIndex}
+      />
 
+      {/* Forth Section: Alerts Overview Section */}
       <div className="flex justify-end items-center space-x-2 mb-4 mt-10">
         <Tabs defaultValue="overview" className="w-full">
           <div className="flex justify-between items-center gap-3">
