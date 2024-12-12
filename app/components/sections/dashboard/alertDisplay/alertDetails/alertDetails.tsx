@@ -506,10 +506,11 @@ export function AlertDetails({
                       )}
                     </div>
                   </div>
-                  {/* Customer Details */}
+                  {/* Overview Customer Details and WatchlIst*/}
                   <Card className="mt-6">
                     <CardContent className="p-6">
                       <div className="grid grid-cols-2 gap-6">
+                        {/* Overview customer details */}
                         <Collapsible
                           open={isCustomerDetailsExpanded}
                           onOpenChange={setIsCustomerDetailsExpanded}
@@ -572,7 +573,7 @@ export function AlertDetails({
                           </CollapsibleContent>
                         </Collapsible>
 
-                        {/* Overview Watchlist */}
+                        {/* Overview Watchlist details */}
                         <Collapsible
                           open={isWatchlistDetailsExpanded}
                           onOpenChange={setIsWatchlistDetailsExpanded}
@@ -875,35 +876,67 @@ export function AlertDetails({
             </Card>
           </TabsContent>
 
+          {/* NEW TAB WATCHLIST */}
           <TabsContent value="watchlistMatch">
             <Card>
               <CardContent className="p-6">
+                {/* watchlist entity */}
                 <div className="grid grid-cols-2 gap-6">
                   <div>
                     <h3 className="text-lg font-semibold mb-4">
                       Watchlist Entity
                     </h3>
-                    <p className="text-gray-600 mb-2">
+                    <p className="text-gray-600 text-sm mb-2">
                       <span className="font-medium">Name:</span>{" "}
                       {alert?.details?.watchlistDetails?.name}
                     </p>
-                    <p className="text-gray-600 mb-2">
-                      <span className="font-medium">Date of Birth:</span>{" "}
-                      {alert?.details?.watchlistDetails?.dob}
-                    </p>
-                    <p className="text-gray-600 mb-2">
-                      <span className="font-medium">Nationality:</span>{" "}
-                      {alert?.details?.watchlistDetails?.citizenship}
-                    </p>
-                    <p className="text-gray-600 mb-2">
-                      <span className="font-medium">Source:</span>{" "}
-                      {alert?.details?.watchlistDetails?.source}
-                    </p>
-                    <p className="text-gray-600 mb-2">
-                      <span className="font-medium">Note:</span>{" "}
-                      {alert?.details?.watchlistDetails?.notes || "N/A"}
-                    </p>
+                    {alert?.details?.watchlistDetails?.alias && (
+                      <p className="text-gray-600 text-sm mb-2">
+                        <span className="font-medium">Alias:</span>{" "}
+                        {alert?.details?.watchlistDetails?.alias}
+                      </p>
+                    )}
+                    {alert?.details?.watchlistDetails?.dob && (
+                      <p className="text-gray-600 text-sm mb-2">
+                        <span className="font-medium">Date of Birth:</span>{" "}
+                        {alert?.details?.watchlistDetails?.dob}
+                      </p>
+                    )}
+                    {alert?.details?.watchlistDetails?.citizenship && (
+                      <p className="text-gray-600 text-sm mb-2">
+                        <span className="font-medium">Citizenship:</span>{" "}
+                        {alert?.details?.watchlistDetails?.citizenship}
+                      </p>
+                    )}
+                    {alert?.details?.watchlistDetails?.countryOfResidence && (
+                      <p className="text-gray-600 text-sm mb-2">
+                        <span className="font-medium">
+                          Country of Residence:
+                        </span>{" "}
+                        {alert?.details?.watchlistDetails?.countryOfResidence}
+                      </p>
+                    )}
+                    {alert?.details?.watchlistDetails?.source && (
+                      <p className="text-gray-600 text-sm mb-2">
+                        <span className="font-medium">Source:</span>{" "}
+                        {alert?.sanctions_source}
+                      </p>
+                    )}
+                    {alert?.details?.watchlistDetails?.source_url && (
+                      <p className="text-gray-600 text-sm mb-2">
+                        <span className="font-medium">SourceURL:</span>{" "}
+                        {alert?.details?.watchlistDetails?.source_url}
+                      </p>
+                    )}
+
+                    {alert?.details?.watchlistDetails?.notes && (
+                      <p className="text-gray-600 text-sm mb-2">
+                        <span className="font-medium">Note:</span>{" "}
+                        {alert?.details?.watchlistDetails?.notes}
+                      </p>
+                    )}
                   </div>
+                  {/* Watchlist Additional Informatiion */}
                   <div>
                     <h3 className="text-lg font-semibold mb-4">
                       Additional Information
@@ -932,6 +965,7 @@ export function AlertDetails({
                     </h4>
                   </div>
                 </div>
+                {/* watchlist json */}
                 <div className="mt-6">
                   <Collapsible
                     open={isJsonExpanded}

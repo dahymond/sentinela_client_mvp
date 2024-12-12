@@ -19,13 +19,14 @@ const Dashboard = () => {
   if (!session) {
     return (
       <div className="flex w-screen h-screen gap-2 items-center justify-center bg-gray-200">
-        Access Denied. Please{" "}
+        Access Denied. Please refresh this page or {" "}
         <span
           onClick={() => push("/")}
           className="cursor-pointer underline text-blue-700"
         >
           log in.
         </span>
+        here
       </div>
     );
   }

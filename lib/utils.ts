@@ -47,7 +47,8 @@ export type sanctionsType =
   | "us_ofac_sdn"
   | "fr_tresor_gels_avoir"
   | "gb_hmt_sanctions"
-  | "un_sc_sanctions";
+  | "un_sc_sanctions"
+  |"qa_nctc_sanctions";
 
 export const readableSanctionString = (sanction: sanctionsType) => {
   const mapping = {
@@ -56,6 +57,7 @@ export const readableSanctionString = (sanction: sanctionsType) => {
     fr_tresor_gels_avoir: "France Tresor List",
     gb_hmt_sanctions: "Great Britain HTM Sanction",
     un_sc_sanctions: "UN SC Sanctions",
+    qa_nctc_sanctions: "Qatar NCTC Sanctions"
   };
 
   return mapping[sanction];
