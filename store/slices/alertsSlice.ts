@@ -98,6 +98,7 @@ export const getAdditionalAlert = createAsyncThunk(
     }
   }
 );
+
 export const deleteMainAlert = createAsyncThunk(
   "deleteMainAlert",
   async (alertId: number, thunkApi) => {
@@ -140,6 +141,7 @@ const alertsSlice = createSlice({
       (state, action: PayloadAction<APIResponse>) => {
         state.submit_alert_loading = false;
         state.main_alert = action?.payload?.main_alert;
+        state.main_alert_mini_details = action?.payload?.main_alert;
         state.additional_alerts = action?.payload?.additional_alerts;
       }
     );
