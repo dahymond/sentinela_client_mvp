@@ -211,8 +211,8 @@ export function AlertDetails({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">
-              {alert?.details?.customerDetails?.name}
+            <p className="text-lg font-semibold capitalize">
+              {String(alert?.details?.customerDetails?.name)?.toLowerCase()}
             </p>
           </CardContent>
         </Card>

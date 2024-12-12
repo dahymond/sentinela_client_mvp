@@ -11,6 +11,7 @@ import {
   ArrowLeftCircle,
   ArrowRightCircle,
   SearchIcon,
+  Trash2Icon,
 } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/app/components/ui/tabs";
@@ -31,6 +32,7 @@ import AlertScreeningSetup from "./alertScreeningSetup/alertScreeningSetup";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { ActiveTabsType, Column } from "../../interfaces/interfaces";
 import {
+  deleteMainAlert,
   getAllAlerts,
   getMainAlert,
   updatealertsSlice,
@@ -40,16 +42,23 @@ import {
   baseClientURL,
   readableSanctionString,
   sanctionsType,
+  useToast,
 } from "@/lib/utils";
+import { spinner } from "../../ui/spinner";
 
 export function DashboardComponent({ session }: { session: Session }) {
   const [firstName, setFirstName] = useState<string | undefined>("");
   const [lastName, setLastName] = useState<string | undefined>("");
   const dispatch = useAppDispatch();
 
-  const { all_main_alerts, main_alert, main_alert_loading } = useAppSelector(
-    (store) => store.alertSlice
-  );
+  const toast = useToast();
+
+  const {
+    all_main_alerts,
+    main_alert,
+    main_alert_loading,
+    delete_alert_loading,
+  } = useAppSelector((store) => store.alertSlice);
   const [activeTab, setActiveTab] = useState<ActiveTabsType>("alerts");
   // const [main_alert, setSelectedAlert] = useState<any>(main_alert);
   const [isMenuExpanded, setIsMenuExpanded] = useState(true);
@@ -64,8 +73,10 @@ export function DashboardComponent({ session }: { session: Session }) {
     "disposition",
     "score",
     "additionalAlertsCount",
+    "delete",
   ]);
 
+  const [rowIdToDelete, setRowIdToDelete] = useState(0)
   useEffect(() => {
     dispatch(getAllAlerts());
   }, [dispatch]);
@@ -191,7 +202,11 @@ export function DashboardComponent({ session }: { session: Session }) {
                   >
                     {columnOrder.map((column) => (
                       <td key={column} className="py-4 text-center">
-                        {column === "disposition" ? (
+                        {column === "name" ? (
+                          <span className="capitalize">
+                            {String(row?.name)?.toLowerCase()}
+                          </span>
+                        ) : column === "disposition" ? (
                           <span
                             className={`px-2 py-1 rounded-full text-xs ${
                               row.disposition === "Pending Review"
@@ -227,6 +242,40 @@ export function DashboardComponent({ session }: { session: Session }) {
                           <span className="text-xs">
                             {readableSanctionString(row?.sanctions_source)}
                           </span>
+                        ) : column == "delete" ? (
+                          <div
+                            title="delete alert"
+                            className="flex justify-center text-red-700 cursor-pointer hover:text-red-300 items-center"
+                          >
+                            {delete_alert_loading && row.id === rowIdToDelete ? (
+                              <span className="text-red-600">{spinner()}</span>
+                            ) : (
+                              <Trash2Icon
+                                onClick={async (e) => {
+                                  e.stopPropagation(); // Prevent event bubbling to parent
+                                  const rowId = row.id;
+                                  setRowIdToDelete(rowId)
+                                  const result = await dispatch(
+                                    deleteMainAlert(Number(row.id))
+                                  );
+                                  if (
+                                    result.meta.requestStatus === "fulfilled"
+                                  ) {
+                                    toast(
+                                      "success",
+                                      `Alert with Id: ${rowId} is successfully deleted`
+                                    );
+                                  } else {
+                                    toast(
+                                      "error",
+                                      "Could not delete alert. Please try again or contact hi@sentinela.ai."
+                                    );
+                                  }
+                                }}
+                                size={15}
+                              />
+                            )}
+                          </div>
                         ) : (
                           <span className="text-sm">{row[column]}</span>
                         )}

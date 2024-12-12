@@ -275,4 +275,5 @@ export type Column =
   | "sanctions_source"
   | "disposition"
   | "score"
-  | "additionalAlertsCount";
+  | "additionalAlertsCount"
+  | "delete";

@@ -14,12 +14,14 @@ type AlertsSliceType = {
   main_alert_loading: boolean;
   additional_alerts_loading: boolean;
   submit_alert_loading: boolean;
+  delete_alert_loading: boolean;
 
   // errors loading
   all_main_alerts_error: boolean;
   main_alert_error: boolean;
   additional_alerts_error: boolean;
   submit_alert_error: boolean;
+  delete_alert_error: boolean;
 };
 
 const initialState: AlertsSliceType = {
@@ -27,14 +29,20 @@ const initialState: AlertsSliceType = {
   main_alert: null, // Will hold the main alert data
   main_alert_mini_details: null,
   additional_alerts: [], // Initially empty
+
+  // loading states
   all_main_alerts_loading: false,
   main_alert_loading: false,
   additional_alerts_loading: false,
   submit_alert_loading: false,
+  delete_alert_loading: false,
+
+  // errors state
   all_main_alerts_error: false,
   main_alert_error: false,
   additional_alerts_error: false,
   submit_alert_error: false,
+  delete_alert_error: false,
 };
 
 export const getAllAlerts = createAsyncThunk(
@@ -90,6 +98,24 @@ export const getAdditionalAlert = createAsyncThunk(
     }
   }
 );
+export const deleteMainAlert = createAsyncThunk(
+  "deleteMainAlert",
+  async (alertId: number, thunkApi) => {
+    try {
+      const { data } = await axiosInstance.delete(
+        `/sentinela/alerts/delete/${alertId}`
+      );
+      //   console.log(data);
+      return data;
+    } catch (err: any) {
+      return thunkApi.rejectWithValue(
+        err?.response?.data?.error ||
+          err.message ||
+          "Something went wrong. Please try again"
+      );
+    }
+  }
+);
 
 const alertsSlice = createSlice({
   name: "alerts",
@@ -103,6 +129,7 @@ const alertsSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    //
     // Submit PII/Generate Alert
     builder.addCase(submitPII.pending, (state, action: {}) => {
       state.submit_alert_loading = true;
@@ -148,7 +175,6 @@ const alertsSlice = createSlice({
       getMainAlert.fulfilled,
       (state, action: PayloadAction<any>) => {
         state.main_alert_loading = false;
-        // console.log(action.payload);
         state.main_alert = action?.payload?.main_alert;
         state.main_alert_mini_details = action?.payload?.main_alert;
         state.additional_alerts = action?.payload?.additional_alerts;
@@ -170,12 +196,37 @@ const alertsSlice = createSlice({
         // we're updating main alert even if this additional alert slice
         //the additional_alert variable might not be needed/used in the entire application. I will double check to confirm
         state.main_alert_loading = false;
+        state.main_alert_error =false;
         state.main_alert = action?.payload;
       }
     );
     builder.addCase(getAdditionalAlert.rejected, (state, { payload }: any) => {
       state.main_alert_loading = false;
       state.main_alert_error = true;
+    });
+
+    // Delete Main Alert
+    builder.addCase(deleteMainAlert.pending, (state, action: {}) => {
+      state.delete_alert_loading = true;
+      state.delete_alert_error = false;
+    });
+
+    builder.addCase(
+      deleteMainAlert.fulfilled,
+      (state, action: PayloadAction<any>) => {
+        // we're updating main alert even if this additional alert slice
+        //the additional_alert variable might not be needed/used in the entire application. I will double check to confirm
+        state.delete_alert_loading = false;
+        state.delete_alert_error = false;
+        if(state.all_main_alerts){
+          state.all_main_alerts = [...state.all_main_alerts].filter((alert)=>alert.id !== action?.payload?.alertId);
+        }
+      }
+    );
+
+    builder.addCase(deleteMainAlert.rejected, (state, { payload }: any) => {
+      state.delete_alert_loading = false;
+      state.delete_alert_error = true;
     });
   },
 });
