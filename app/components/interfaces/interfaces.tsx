@@ -277,3 +277,5 @@ export type Column =
   | "score"
   | "additionalAlertsCount"
   | "delete";
+
+  export type SanctionsCountry = 'eu' | 'fr' | 'us' | 'uk' | 'qr' | 'un'

@@ -1,6 +1,7 @@
 import { baseServerURL } from "@/lib/utils";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../interceptors";
+import { SanctionsCountry } from "@/app/components/interfaces/interfaces";
 
 export const submitPII = createAsyncThunk(
   "submitPII",
@@ -31,6 +32,7 @@ interface ScreeningSetUpState {
   national_identification_number: string;
   passport_number: string;
   fuzzyThreshold: number;
+  sanctions_list: SanctionsCountry[]
 }
 
 const initialState: ScreeningSetUpState = {
@@ -43,6 +45,7 @@ const initialState: ScreeningSetUpState = {
   national_identification_number: "",
   passport_number: "",
   fuzzyThreshold: 60,
+  sanctions_list: ['us'],
 };
 
 const screeningSetUpSlice = createSlice({

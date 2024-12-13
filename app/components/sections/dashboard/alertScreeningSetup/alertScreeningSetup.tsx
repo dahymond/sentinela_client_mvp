@@ -3,6 +3,7 @@ import { Button } from "@/app/components/ui/button";
 import { Card, CardContent } from "@/app/components/ui/card";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { Slider } from "@/app/components/ui/slider";
 import {
   Tabs,
@@ -18,7 +19,7 @@ import {
   updateScreeningSetUp,
 } from "@/store/slices/screeningSetUpSlice";
 import { Search, Upload } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, } from "react";
 
 const AlertScreeningSetup = ({
   setActiveTab,
@@ -36,18 +37,29 @@ const AlertScreeningSetup = ({
     national_identification_number,
     passport_number,
     fuzzyThreshold,
+    sanctions_list,
   } = useAppSelector((store) => store.screeningSetup);
 
+  // const handleValueChange = (value: string[]) => {
+  //   setSelectedValues(value);
+  // };
   const { submit_alert_loading } = useAppSelector((store) => store.alertSlice);
-  const toast = useToast()
-  
+  const toast = useToast();
   const onChange = ({ target }: any) => {
     const { name, value } = target;
     dispatch(updateScreeningSetUp({ name, value }));
   };
 
   const submitPIIDetails = async () => {
-    const data = {
+    if (sanctions_list.length === 0) {
+      toast("error", "Please select at least one sanctions list to search");
+      return;
+    }
+    if (!full_name) {
+      toast("error", "Full name field cannot be empty");
+      return;
+    }
+    const data: any = {
       full_name: full_name,
       alias,
       address,
@@ -57,12 +69,25 @@ const AlertScreeningSetup = ({
       national_identification_number,
       passport_number,
       match_threshold: fuzzyThreshold,
+      sanctions_list,
     };
+    let numberoffilledfields = 0;
+    for (const v in data) {
+      if (data[v] !== "") {
+        numberoffilledfields++;
+      }
+    }
+    if (numberoffilledfields < 4) {
+      toast("error", "Please fill in Full Name and an extra field");
+      return;
+    }
+    // console.log(numberoffilledfields, data);
+
     const result = await dispatch(submitPII(data));
     if (result.meta.requestStatus === "fulfilled") {
       setActiveTab("alerts");
     } else {
-      toast('error', result?.payload?.toString())
+      toast("error", result?.payload?.toString());
       console.log(result.payload);
     }
   };
@@ -166,6 +191,29 @@ const AlertScreeningSetup = ({
                 </div>
               </div>
               <div className="space-y-2">
+                <h4 className="text-sm">Sanctions List to Search</h4>
+                <ToggleGroup.Root
+                  type="multiple"
+                  className="flex space-x-4"
+                  value={sanctions_list}
+                  onValueChange={(value) =>
+                    dispatch(
+                      updateScreeningSetUp({ name: "sanctions_list", value })
+                    )
+                  }
+                >
+                  {["us", "eu", "uk", "un", "fr", "qr"].map((region) => (
+                    <ToggleGroup.Item
+                      key={region}
+                      value={region}
+                      className="px-3 py-2 bg-gray-200 rounded text-sm hover:bg-gray-300 data-[state=on]:bg-blue-500 data-[state=on]:text-white"
+                    >
+                      {region.toUpperCase()}
+                    </ToggleGroup.Item>
+                  ))}
+                </ToggleGroup.Root>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="fuzzyScore">
                   Fuzzy Score: {fuzzyThreshold}
                 </Label>
@@ -186,6 +234,7 @@ const AlertScreeningSetup = ({
                   className="w-full"
                 />
               </div>
+
               <Button
                 disabled={submit_alert_loading}
                 onClick={submitPIIDetails}

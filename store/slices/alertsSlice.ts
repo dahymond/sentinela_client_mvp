@@ -3,19 +3,20 @@ import axiosInstance from "../interceptors";
 import { submitPII } from "./screeningSetUpSlice";
 import { APIResponse, MainAlert } from "@/app/components/interfaces/interfaces";
 
+
 type AlertsSliceType = {
   all_main_alerts: Omit<MainAlert, "details">[];
   main_alert: MainAlert | null;
   main_alert_mini_details: Omit<MainAlert, "details"> | null;
   additional_alerts: MainAlert[];
-
+  
   // pending loading
   all_main_alerts_loading: boolean;
   main_alert_loading: boolean;
   additional_alerts_loading: boolean;
   submit_alert_loading: boolean;
   delete_alert_loading: boolean;
-
+  
   // errors loading
   all_main_alerts_error: boolean;
   main_alert_error: boolean;
@@ -29,6 +30,7 @@ const initialState: AlertsSliceType = {
   main_alert: null, // Will hold the main alert data
   main_alert_mini_details: null,
   additional_alerts: [], // Initially empty
+ 
 
   // loading states
   all_main_alerts_loading: false,
