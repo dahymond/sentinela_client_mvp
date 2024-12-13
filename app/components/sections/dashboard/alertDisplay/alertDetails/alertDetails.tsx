@@ -32,7 +32,7 @@ import { ScrollArea } from "../../../../ui/scroll-area";
 import { Separator } from "../../../../ui/separator";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { updatealertsSlice } from "@/store/slices/alertsSlice";
-import { isValidDateString, readableSanctionString } from "@/lib/utils";
+import { estTimeZone, readableSanctionString } from "@/lib/utils";
 import { MainAlertQueue } from "./mainAlertQueue";
 
 export function AlertDetails({
@@ -243,16 +243,20 @@ export function AlertDetails({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs font-semibold">
-              {isValidDateString(alert?.alertDateTime)
-                ? new Date(alert?.alertDateTime).toUTCString()
-                : "N/A"}
+            <p className="text-md font-semibold">
+              {estTimeZone(alert?.alertDateTime)}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Second Section: Few Main Alert details*/}
+      {/* Second Section: Few Main Alert details */}
+      {/* {(activeAlertIndex !== null && !main_alert_loading) && (
+        <MainAlertQueue
+          activeAlertIndex={activeAlertIndex}
+          setActiveAlertIndex={setActiveAlertIndex}
+          />
+        )} */}
       <MainAlertQueue
         activeAlertIndex={activeAlertIndex}
         setActiveAlertIndex={setActiveAlertIndex}

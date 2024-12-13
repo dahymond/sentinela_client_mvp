@@ -21,15 +21,22 @@ export function MainAlertQueue({
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle>Main Alert for This Customer</CardTitle>
+        <CardTitle>Main Alert</CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="max-h-[70px] text-[13px]">
+        <div className="grid grid-cols-[1fr,1fr,1fr,1fr,2fr] gap-4 pb-3 px-7 place-items-center text-sm font-bold">
+          <span>Alert ID</span>
+          <span>Disposition</span>
+          <span>Watchlist Match</span>
+          <span>Risk Score</span>
+          <span>Alert Date</span>
+        </div>
+        <ScrollArea className="max-h-[70px] text-[15px]">
           {main_alert_mini_details && (
             <div
-              className={`grid grid-cols-4 gap-4 ${
+              className={`grid grid-cols-[1fr,1fr,1fr,1fr,2fr] gap-4 ${
                 activeAlertIndex === null && "bg-gray-100"
-              } p-2 hover:bg-gray-200 cursor-pointer items-center rounded-md`}
+              } p-2 hover:bg-gray-200 cursor-pointer rounded-md place-items-center text-center`}
               onClick={async () => {
                 setActiveAlertIndex(null);
                 await dispatch(
@@ -45,19 +52,30 @@ export function MainAlertQueue({
                 {activeAlertIndex === null && !main_alert_loading && (
                   <CheckCircle2 className="text-green-700 text-xs" size={20} />
                 )}{" "}
-                Alert ID: {main_alert_mini_details.id}
+                {main_alert_mini_details.id}
               </div>
+              <span
+                className={`px-2 py-1 rounded-full text-xs ${
+                  main_alert_mini_details.disposition === "Pending Review"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : main_alert_mini_details.disposition === "False Positive"
+                    ? "bg-green-100 text-green-800"
+                    : main_alert_mini_details.disposition === "Escalated"
+                    ? "bg-red-100 text-red-800"
+                    : main_alert_mini_details.disposition === "Inconclusive"
+                    ? "bg-purple-200 text-red-900"
+                    : "bg-blue-100 text-blue-800"
+                }`}
+              >
+                {main_alert_mini_details?.disposition}
+              </span>
               <span>
-                Watchlist Match:{" "}
                 {readableSanctionString(
                   main_alert_mini_details.sanctions_source
                 ) || main_alert_mini_details.sanctions_source}
               </span>
-              <span>
-                Risk Score: {Number(main_alert_mini_details?.score)?.toFixed(0)}
-              </span>
-              <span className="text-xs">
-                Alert Date:{" "}
+              <span>{Number(main_alert_mini_details?.score)?.toFixed(0)}</span>
+              <span className="text-md">
                 {isValidDateString(main_alert_mini_details?.alertDateTime)
                   ? new Date(
                       main_alert_mini_details?.alertDateTime

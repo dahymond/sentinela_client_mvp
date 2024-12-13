@@ -191,22 +191,22 @@ const alertsSlice = createSlice({
 
     // Get Additional Alert
     builder.addCase(getAdditionalAlert.pending, (state, action: {}) => {
-      state.main_alert_loading = true;
-      state.main_alert_error = false;
+      state.additional_alerts_loading = true;
+      state.additional_alerts_error = false;
     });
     builder.addCase(
       getAdditionalAlert.fulfilled,
       (state, action: PayloadAction<any>) => {
         // we're updating main alert even if this additional alert slice
         //the additional_alert variable might not be needed/used in the entire application. I will double check to confirm
-        state.main_alert_loading = false;
-        state.main_alert_error =false;
+        state.additional_alerts_loading = false;
+        state.additional_alerts_error =false;
         state.main_alert = action?.payload;
       }
     );
     builder.addCase(getAdditionalAlert.rejected, (state, { payload }: any) => {
-      state.main_alert_loading = false;
-      state.main_alert_error = true;
+      state.additional_alerts_loading = false;
+      state.additional_alerts_error = true;
     });
 
     // Delete Main Alert
