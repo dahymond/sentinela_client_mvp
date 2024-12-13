@@ -19,7 +19,7 @@ import {
   updateScreeningSetUp,
 } from "@/store/slices/screeningSetUpSlice";
 import { Search, Upload } from "lucide-react";
-import { Dispatch, SetStateAction, } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 const AlertScreeningSetup = ({
   setActiveTab,
@@ -81,6 +81,7 @@ const AlertScreeningSetup = ({
       toast("error", "Please fill in Full Name and an extra field");
       return;
     }
+    toast("success", `Screening started for ${data?.full_name}`);
     // console.log(numberoffilledfields, data);
 
     const result = await dispatch(submitPII(data));
