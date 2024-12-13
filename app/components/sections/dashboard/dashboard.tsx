@@ -1,5 +1,5 @@
 "use client";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import {
   Shield,
   Search,
@@ -77,20 +77,22 @@ export function DashboardComponent({ session }: { session: Session }) {
   ]);
 
   const [rowIdToDelete, setRowIdToDelete] = useState(0);
+
+  const run = useCallback(async () => {
+    const result = await dispatch(getAllAlerts());
+    if (result.meta.requestStatus === "rejected") {
+      toast(
+        "error",
+        typeof result.payload == "string"
+          ? result.payload
+          : JSON.stringify(result.payload)
+      );
+    }
+  }, [toast, dispatch]);
+
   useEffect(() => {
-    const run = async () => {
-      const result = await dispatch(getAllAlerts());
-      if (result.meta.requestStatus === "rejected") {
-        toast(
-          "error",
-          typeof result.payload == "string"
-            ? result.payload
-            : JSON.stringify(result.payload)
-        );
-      }
-    };
     run();
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     setFirstName(session?.user?.firstName);
