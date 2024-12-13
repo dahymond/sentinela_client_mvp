@@ -76,9 +76,20 @@ export function DashboardComponent({ session }: { session: Session }) {
     "delete",
   ]);
 
-  const [rowIdToDelete, setRowIdToDelete] = useState(0)
+  const [rowIdToDelete, setRowIdToDelete] = useState(0);
   useEffect(() => {
-    dispatch(getAllAlerts());
+    const run = async () => {
+      const result = await dispatch(getAllAlerts());
+      if (result.meta.requestStatus === "rejected") {
+        toast(
+          "error",
+          typeof result.payload == "string"
+            ? result.payload
+            : JSON.stringify(result.payload)
+        );
+      }
+    };
+    run();
   }, [dispatch]);
 
   useEffect(() => {
@@ -198,7 +209,17 @@ export function DashboardComponent({ session }: { session: Session }) {
                         ? "pointer-events-none opacity-50"
                         : "opacity-100"
                     } hover:bg-gray-200 transition-colors duration-150`}
-                    onClick={() => dispatch(getMainAlert(row.id))}
+                    onClick={async () => {
+                      const result = await dispatch(getMainAlert(row.id));
+                      if (result.meta.requestStatus === "rejected") {
+                        toast(
+                          "error",
+                          typeof result.payload == "string"
+                            ? result.payload
+                            : JSON.stringify(result.payload)
+                        );
+                      }
+                    }}
                   >
                     {columnOrder.map((column) => (
                       <td key={column} className="py-4 text-center">
@@ -247,14 +268,15 @@ export function DashboardComponent({ session }: { session: Session }) {
                             title="delete alert"
                             className="flex justify-center text-red-700 cursor-pointer hover:text-red-300 items-center"
                           >
-                            {delete_alert_loading && row.id === rowIdToDelete ? (
+                            {delete_alert_loading &&
+                            row.id === rowIdToDelete ? (
                               <span className="text-red-600">{spinner()}</span>
                             ) : (
                               <Trash2Icon
                                 onClick={async (e) => {
                                   e.stopPropagation(); // Prevent event bubbling to parent
                                   const rowId = row.id;
-                                  setRowIdToDelete(rowId)
+                                  setRowIdToDelete(rowId);
                                   const result = await dispatch(
                                     deleteMainAlert(Number(row.id))
                                   );
@@ -266,10 +288,16 @@ export function DashboardComponent({ session }: { session: Session }) {
                                       `Alert with Id: ${rowId} is successfully deleted`
                                     );
                                   } else {
-                                    toast(
-                                      "error",
-                                      "Could not delete alert. Please try again or contact hi@sentinela.ai."
-                                    );
+                                    if (
+                                      result.meta.requestStatus === "rejected"
+                                    ) {
+                                      toast(
+                                        "error",
+                                        typeof result.payload == "string"
+                                          ? result.payload
+                                          : JSON.stringify(result.payload)
+                                      );
+                                    }
                                   }
                                 }}
                                 size={15}

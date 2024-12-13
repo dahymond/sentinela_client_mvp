@@ -3,7 +3,7 @@ import { MainAlert } from "../../../../interfaces/interfaces";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../ui/card";
 import { ScrollArea } from "../../../../ui/scroll-area";
 import { getAdditionalAlert } from "@/store/slices/alertsSlice";
-import { estTimeZone, readableSanctionString } from "@/lib/utils";
+import { estTimeZone, readableSanctionString, useToast } from "@/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
 import { spinner } from "@/app/components/ui/spinner";
@@ -21,6 +21,7 @@ export function AdditionalAlertsQueue({
   const { additional_alerts_loading } = useAppSelector(
     (store) => store.alertSlice
   );
+  const toast = useToast()
   return (
     <Card className="mt-6">
       <CardHeader>
@@ -62,7 +63,15 @@ export function AdditionalAlertsQueue({
                   } cursor-pointer rounded-md place-items-center text-center`}
                   onClick={async () => {
                     setActiveAlertIndex(i);
-                    await dispatch(getAdditionalAlert(Number(alert.id)));
+                    const result = await dispatch(getAdditionalAlert(Number(alert.id)));
+                    if (result.meta.requestStatus === "rejected") {
+                      toast(
+                        "error",
+                        typeof result.payload == "string"
+                          ? result.payload
+                          : JSON.stringify(result.payload)
+                      );
+                    }
                   }}
                 >
                   <div className="flex items-center gap-2">
