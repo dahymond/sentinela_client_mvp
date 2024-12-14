@@ -269,9 +269,10 @@ export function AlertDetails({
         setActiveAlertIndex={setActiveAlertIndex}
       />
 
-      {/* Forth Section: Alerts Overview Section */}
+      {/* Forth Section: Alerts Overview, Cust Details, WatchList Match etc Section */}
       <div className="flex justify-end items-center space-x-2 mb-4 mt-10">
         <Tabs defaultValue="overview" className="w-full">
+          {/* Navigation TABS */}
           <div className="flex justify-between items-center gap-3">
             <TabsList className="">
               <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -375,17 +376,17 @@ export function AlertDetails({
                         {readableSanctionString(alert.sanctions_source) ||
                           alert.sanctions_source}
                       </p>
-                      {alert?.details?.watchlistDetails?.notes && (
+                      {alert?.details?.watchlistDetails?.properties?.notes && (
                         <p className="text-gray-600 mb-2">
                           <span className="font-medium">Reason:</span>{" "}
-                          {alert?.details?.watchlistDetails?.notes}
+                          {alert?.details?.watchlistDetails?.properties?.notes}
                         </p>
                       )}
                       <h4 className="text-md font-semibold mt-4 mb-2">
                         Problematic Tags
                       </h4>
                       <div className="flex flex-wrap gap-2">
-                        {alert?.details?.watchlistDetails?.problematicTags?.map(
+                        {alert?.details?.watchlistDetails?.properties?.topics.map(
                           (tag, index) => (
                             <span
                               key={index}
@@ -551,59 +552,75 @@ export function AlertDetails({
                           <CollapsibleContent>
                             <p className="text-gray-600 text-sm mb-2">
                               <span className="font-medium">Name:</span>{" "}
-                              {alert?.details?.watchlistDetails?.name}
+                              {alert?.details?.watchlistDetails?.caption}
                             </p>
-                            {alert?.details?.watchlistDetails?.alias && (
+                            {alert?.details?.watchlistDetails?.properties
+                              ?.alias && (
                               <p className="text-gray-600 text-sm mb-2">
                                 <span className="font-medium">Alias:</span>{" "}
-                                {alert?.details?.watchlistDetails?.alias}
+                                {alert?.details?.watchlistDetails?.properties?.alias.join(
+                                  ", "
+                                )}
                               </p>
                             )}
-                            {alert?.details?.watchlistDetails?.dob && (
+                            {alert?.details?.watchlistDetails?.properties
+                              .birthDate && (
                               <p className="text-gray-600 text-sm mb-2">
                                 <span className="font-medium">
                                   Date of Birth:
                                 </span>{" "}
-                                {alert?.details?.watchlistDetails?.dob}
+                                {alert?.details?.watchlistDetails?.properties.birthDate.join(
+                                  ", "
+                                )}
                               </p>
                             )}
-                            {alert?.details?.watchlistDetails?.citizenship && (
+                            {alert?.details?.watchlistDetails?.properties
+                              .birthPlace && (
                               <p className="text-gray-600 text-sm mb-2">
                                 <span className="font-medium">
                                   Citizenship:
                                 </span>{" "}
-                                {alert?.details?.watchlistDetails?.citizenship}
+                                {alert?.details?.watchlistDetails?.properties.birthPlace.join(
+                                  " | "
+                                )}
                               </p>
                             )}
-                            {alert?.details?.watchlistDetails
-                              ?.countryOfResidence && (
+                            {alert?.details?.watchlistDetails?.properties
+                              ?.nationality && (
                               <p className="text-gray-600 text-sm mb-2">
                                 <span className="font-medium">
                                   Country of Residence:
                                 </span>{" "}
-                                {
-                                  alert?.details?.watchlistDetails
-                                    ?.countryOfResidence
-                                }
+                                {alert?.details?.watchlistDetails?.properties?.nationality.join(
+                                  " | "
+                                )}
                               </p>
                             )}
-                            {alert?.details?.watchlistDetails?.source && (
+                            {alert?.details?.watchlistDetails?.datasets && (
                               <p className="text-gray-600 text-sm mb-2">
                                 <span className="font-medium">Source:</span>{" "}
-                                {alert?.sanctions_source}
+                                {alert?.details.watchlistDetails.datasets.join(
+                                  " | "
+                                )}
                               </p>
                             )}
-                            {alert?.details?.watchlistDetails?.source_url && (
+                            {alert?.details?.watchlistDetails?.properties
+                              ?.sourceUrl && (
                               <p className="text-gray-600 text-sm mb-2">
                                 <span className="font-medium">SourceURL:</span>{" "}
-                                {alert?.details?.watchlistDetails?.source_url}
+                                {alert?.details?.watchlistDetails?.properties?.sourceUrl.join(
+                                  " | "
+                                )}
                               </p>
                             )}
 
-                            {alert?.details?.watchlistDetails?.notes && (
+                            {alert?.details?.watchlistDetails?.properties
+                              .notes && (
                               <p className="text-gray-600 text-sm mb-2">
                                 <span className="font-medium">Note:</span>{" "}
-                                {alert?.details?.watchlistDetails?.notes}
+                                {alert?.details?.watchlistDetails?.properties.notes.join(
+                                  " | "
+                                )}
                               </p>
                             )}
                           </CollapsibleContent>
@@ -843,51 +860,66 @@ export function AlertDetails({
                     </h3>
                     <p className="text-gray-600 text-sm mb-2">
                       <span className="font-medium">Name:</span>{" "}
-                      {alert?.details?.watchlistDetails?.name}
+                      {alert?.details?.watchlistDetails?.caption}
                     </p>
-                    {alert?.details?.watchlistDetails?.alias && (
+                    {alert?.details?.watchlistDetails?.properties?.alias && (
                       <p className="text-gray-600 text-sm mb-2">
                         <span className="font-medium">Alias:</span>{" "}
-                        {alert?.details?.watchlistDetails?.alias}
+                        {alert?.details?.watchlistDetails?.properties?.alias.join(
+                          ", "
+                        )}
                       </p>
                     )}
-                    {alert?.details?.watchlistDetails?.dob && (
+                    {alert?.details?.watchlistDetails?.properties.birthDate && (
                       <p className="text-gray-600 text-sm mb-2">
                         <span className="font-medium">Date of Birth:</span>{" "}
-                        {alert?.details?.watchlistDetails?.dob}
+                        {alert?.details?.watchlistDetails?.properties.birthDate.join(
+                          ", "
+                        )}
                       </p>
                     )}
-                    {alert?.details?.watchlistDetails?.citizenship && (
+                    {alert?.details?.watchlistDetails?.properties
+                      .birthPlace && (
                       <p className="text-gray-600 text-sm mb-2">
                         <span className="font-medium">Citizenship:</span>{" "}
-                        {alert?.details?.watchlistDetails?.citizenship}
+                        {alert?.details?.watchlistDetails?.properties.birthPlace.join(
+                          " | "
+                        )}
                       </p>
                     )}
-                    {alert?.details?.watchlistDetails?.countryOfResidence && (
+                    {alert?.details?.watchlistDetails?.properties
+                      ?.nationality && (
                       <p className="text-gray-600 text-sm mb-2">
                         <span className="font-medium">
                           Country of Residence:
                         </span>{" "}
-                        {alert?.details?.watchlistDetails?.countryOfResidence}
+                        {alert?.details?.watchlistDetails?.properties?.nationality.join(
+                          " | "
+                        )}
                       </p>
                     )}
-                    {alert?.details?.watchlistDetails?.source && (
+                    {alert?.details?.watchlistDetails?.datasets && (
                       <p className="text-gray-600 text-sm mb-2">
                         <span className="font-medium">Source:</span>{" "}
-                        {alert?.sanctions_source}
+                        {alert?.details.watchlistDetails.datasets.join(" | ")}
                       </p>
                     )}
-                    {alert?.details?.watchlistDetails?.source_url && (
+                    {alert?.details?.watchlistDetails?.properties
+                      ?.sourceUrl && (
                       <p className="text-gray-600 text-sm mb-2">
                         <span className="font-medium">SourceURL:</span>{" "}
-                        {alert?.details?.watchlistDetails?.source_url}
+                        {alert?.details?.watchlistDetails?.properties?.sourceUrl.join(
+                          " | "
+                        )}
                       </p>
                     )}
 
-                    {alert?.details?.watchlistDetails?.notes && (
+                    {alert?.details?.watchlistDetails?.properties.notes && (
                       <p className="text-gray-600 text-sm mb-2">
                         <span className="font-medium">Note:</span>{" "}
-                        {alert?.details?.watchlistDetails?.notes}
+                        {alert?.details?.watchlistDetails?.properties.notes.join(
+                          " | "
+                        )}
                       </p>
                     )}
                   </div>
@@ -909,13 +941,16 @@ export function AlertDetails({
                     <h4 className="text-sm  mb-2">
                       <span className="font-semibold">Addresses</span>
                       <span className="list-disc pl-5 mb-4">
-                        {`${alert?.details?.watchlistDetails?.location} | ${alert?.details?.watchlistDetails?.citizenship}`}
+                        {`
+                        ${alert?.details?.watchlistDetails?.properties?.address} |
+                        ${alert?.details?.watchlistDetails?.properties?.birthPlace} |
+                        ${alert?.details?.watchlistDetails?.properties?.nationality}`}
                       </span>
                     </h4>
                     <h4 className="text-sm  mb-2">
                       <span className="font-semibold">Phone Numbers</span>
                       <span className="list-disc pl-5 mb-4">
-                        {`${alert?.details?.watchlistDetails?.phone || "N/A"}`}
+                        {`${alert?.details?.watchlistDetails?.properties?.phone || "N/A"}`}
                       </span>
                     </h4>
                   </div>

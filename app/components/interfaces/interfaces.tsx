@@ -197,22 +197,53 @@ export interface EntityEnrichment {
 }
 
 export interface WatchlistDetails {
-  id: string;
-  notes?: string;
-  location?: string;
-  source?: string;
-  problematicTags?: string[];
-  alias?: string;
-  citizenship?: string;
-  countryOfResidence?: string;
-  dob?: string;
-  name?: string;
-  phone: string;
-  nationalID?: string;
-  passportNumber?: string;
+  // id: string;
+  // notes?: string;
+  // location?: string;
+  // source?: string;
+  // problematicTags?: string[];
+  // alias?: string;
+  // citizenship?: string;
+  // countryOfResidence?: string;
+  // dob?: string;
+  // name?: string;
+  // phone: string;
+  // nationalID?: string;
+  // passportNumber?: string;
+  // referents?: string;
+  // sanction_id?: string;
+  // source_url?: string;
+  _id: string;
+  caption: string;
+  schema: string;
+  properties: {
+    name: string[];
+    alias: string[];
+    topics: string[];
+    weakAlias:string[],
+    phone:string[],
+    birthDate: string[];
+    addressEntity: string[];
+    idNumber: string[];
+    nationality: string[];
+    position: string[];
+    birthPlace: string[];
+    lastName: string[];
+    country: string[];
+    address: string[];
+    firstName: string[];
+    gender: string[];
+    sourceUrl: string[];
+    notes:string[];
+    source_Url: string[];
+
+  };
   referents?: string;
-  sanction_id?: string;
-  source_url?: string;
+  datasets: string[];
+  first_seen: string;
+  last_seen: string;
+  last_change: string;
+  target: boolean;
 }
 
 export interface Documentation {
@@ -246,13 +277,14 @@ export interface AlertDetails {
 export interface MainAlert {
   id: string;
   name: string;
-  custom_id:string;
+  custom_id: string;
   sanctions_source:
     | "eu_fsf"
     | "us_ofac_sdn"
     | "fr_tresor_gels_avoir"
     | "gb_hmt_sanctions"
-    | "un_sc_sanctions";
+    | "un_sc_sanctions"
+    | "qa_nctc_sanctions";
   disposition: string;
   score: number;
   alertDateTime: string;
@@ -279,4 +311,4 @@ export type Column =
   | "additionalAlertsCount"
   | "delete";
 
-  export type SanctionsCountry = 'eu' | 'fr' | 'us' | 'uk' | 'qr' | 'un'
+export type SanctionsCountry = "eu" | "fr" | "us" | "uk" | "qr" | "un";
