@@ -201,7 +201,7 @@ export function AlertDetails({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg font-semibold">{alert.id}</p>
+            <p className="text-lg font-semibold">{alert?.custom_id}</p>
           </CardContent>
         </Card>
         <Card>
