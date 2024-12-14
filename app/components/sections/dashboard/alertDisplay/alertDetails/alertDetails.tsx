@@ -942,15 +942,35 @@ export function AlertDetails({
                       <span className="font-semibold">Addresses</span>
                       <span className="list-disc pl-5 mb-4">
                         {`
-                        ${alert?.details?.watchlistDetails?.properties?.address} |
-                        ${alert?.details?.watchlistDetails?.properties?.birthPlace} |
-                        ${alert?.details?.watchlistDetails?.properties?.nationality}`}
+                        ${
+                          alert?.details?.watchlistDetails?.properties?.address
+                            ? alert?.details?.watchlistDetails?.properties
+                                ?.address + " | "
+                            : ""
+                        }
+                        ${
+                          alert?.details?.watchlistDetails?.properties
+                            ?.birthPlace
+                            ? alert?.details?.watchlistDetails?.properties
+                                ?.birthPlace + " | "
+                            : ""
+                        }
+                        ${
+                          alert?.details?.watchlistDetails?.properties
+                            ?.nationality
+                            ? alert?.details?.watchlistDetails?.properties
+                                ?.nationality
+                            : ""
+                        }`}
                       </span>
                     </h4>
                     <h4 className="text-sm  mb-2">
                       <span className="font-semibold">Phone Numbers</span>
                       <span className="list-disc pl-5 mb-4">
-                        {`${alert?.details?.watchlistDetails?.properties?.phone || "N/A"}`}
+                        {`${
+                          alert?.details?.watchlistDetails?.properties?.phone ||
+                          "N/A"
+                        }`}
                       </span>
                     </h4>
                   </div>
