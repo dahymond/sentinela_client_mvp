@@ -85,7 +85,7 @@ export function AdditionalAlertsQueue({
                         size={20}
                       />
                     )}{" "}
-                    {alert.id}
+                    {alert.custom_id}
                   </div>
                   <span
                     className={`px-2 py-1 rounded-full text-xs ${

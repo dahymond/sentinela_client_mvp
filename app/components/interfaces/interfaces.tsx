@@ -246,6 +246,7 @@ export interface AlertDetails {
 export interface MainAlert {
   id: string;
   name: string;
+  custom_id:string;
   sanctions_source:
     | "eu_fsf"
     | "us_ofac_sdn"

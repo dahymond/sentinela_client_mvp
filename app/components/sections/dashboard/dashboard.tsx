@@ -193,6 +193,7 @@ export function DashboardComponent({ session }: { session: Session }) {
               (
                 row: {
                   id: number;
+                  custom_id: string;
                   disposition: string;
                   name: string;
                   score: number;
@@ -306,7 +307,7 @@ export function DashboardComponent({ session }: { session: Session }) {
                               />
                             )}
                           </div>
-                        ) : (
+                        ) : column == "id" ? <span>{row.custom_id}</span>:(
                           <span className="text-sm">{row[column]}</span>
                         )}
                       </td>

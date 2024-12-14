@@ -2,7 +2,10 @@ import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../ui/card";
 import { ScrollArea } from "../../../../ui/scroll-area";
 import { getMainAlert } from "@/store/slices/alertsSlice";
-import { isValidDateString, readableSanctionString } from "@/lib/utils";
+import {
+  estTimeZone,
+  readableSanctionString,
+} from "@/lib/utils";
 import { CheckCircle2 } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
 import { spinner } from "@/app/components/ui/spinner";
@@ -52,7 +55,7 @@ export function MainAlertQueue({
                 {activeAlertIndex === null && !main_alert_loading && (
                   <CheckCircle2 className="text-green-700 text-xs" size={20} />
                 )}{" "}
-                {main_alert_mini_details.id}
+                {main_alert_mini_details.custom_id}
               </div>
               <span
                 className={`px-2 py-1 rounded-full text-xs ${
@@ -76,11 +79,7 @@ export function MainAlertQueue({
               </span>
               <span>{Number(main_alert_mini_details?.score)?.toFixed(0)}</span>
               <span className="text-md">
-                {isValidDateString(main_alert_mini_details?.alertDateTime)
-                  ? new Date(
-                      main_alert_mini_details?.alertDateTime
-                    ).toUTCString()
-                  : "N/A"}
+                {estTimeZone(main_alert_mini_details?.alertDateTime)}
               </span>
             </div>
           )}

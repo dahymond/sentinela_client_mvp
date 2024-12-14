@@ -86,6 +86,7 @@ const AlertScreeningSetup = ({
 
     const result = await dispatch(submitPII(data));
     if (result.meta.requestStatus === "fulfilled") {
+      toast("success", `Alert(s) found for ${data?.full_name}`);
       setActiveTab("alerts");
     } else {
       toast("error", result?.payload?.toString());
